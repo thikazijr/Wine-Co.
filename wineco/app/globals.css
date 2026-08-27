@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --wine: #722f37;
+    --wine-light: #9e4a55;
+    --wine-dark: #4a1d22;
+    --gold: #c9a03d;
+    --gold-light: #e5be62;
+    --green: #1a6b3c;
+    --dark: #1a1a2e;
+    --cream: #faf6f0;
+    --cream-light: #fffdfa;
+    --text: #2c1a1a;
+  }
+
+  body {
+    background-color: var(--cream);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+}
+
+.font-serif {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+}
+
+/* Custom Utilities */
+.bg-wine { background-color: #722f37; }
+.bg-wine-light { background-color: #9e4a55; }
+.bg-wine-dark { background-color: #4a1d22; }
+.bg-gold { background-color: #c9a03d; }
+.bg-gold-light { background-color: #e5be62; }
+.bg-cream { background-color: #faf6f0; }
+.bg-cream-light { background-color: #fffdfa; }
+
+.text-wine { color: #722f37; }
+.text-wine-light { color: #9e4a55; }
+.text-gold { color: #c9a03d; }
+.text-cream { color: #faf6f0; }
+
+.border-wine { border-color: #722f37; }
+.border-gold { border-color: #c9a03d; }
+
+.btn-wine {
+  background-color: #722f37;
+  color: #ffffff;
+  border-radius: 9999px;
+  padding: 0.625rem 1.75rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.btn-wine:hover {
+  background-color: #552127;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(114, 47, 55, 0.25);
+}
+
+.btn-gold {
+  background-color: #c9a03d;
+  color: #1a1a2e;
+  border-radius: 9999px;
+  padding: 0.625rem 1.75rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.btn-gold:hover {
+  background-color: #b58d2c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(201, 160, 61, 0.3);
+}
+
+.btn-outline-wine {
+  background-color: transparent;
+  color: #722f37;
+  border: 2px solid #722f37;
+  border-radius: 9999px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.btn-outline-wine:hover {
+  background-color: #722f37;
+  color: #ffffff;
+  transform: translateY(-2px);
+}

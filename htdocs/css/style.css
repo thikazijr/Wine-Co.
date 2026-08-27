@@ -1,0 +1,434 @@
+/* Wine & Co. Main Stylesheet */
+
+:root {
+    --wine: #722f37;
+    --wine-light: #9e4a55;
+    --gold: #c9a03d;
+    --green: #1a6b3c;
+    --dark: #1a1a2e;
+    --cream: #f5ede6;
+    --white: #ffffff;
+    --gray: #6c757d;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #fdf8f5 0%, #f5ede6 100%);
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Navigation */
+.navbar {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--gold);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 12px 0;
+}
+
+.navbar-brand {
+    color: var(--wine) !important;
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.navbar-brand span {
+    font-size: 0.75rem;
+    font-weight: normal;
+    background: var(--gold);
+    padding: 2px 8px;
+    border-radius: 20px;
+    color: var(--dark);
+    margin-left: 5px;
+}
+
+.nav-link {
+    color: #4a2c2a !important;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    padding: 8px 16px !important;
+}
+
+.nav-link:hover {
+    color: var(--wine) !important;
+}
+
+/* Buttons */
+.btn-wine {
+    background: linear-gradient(135deg, var(--wine), var(--wine-light));
+    color: var(--white);
+    border-radius: 40px;
+    padding: 10px 30px;
+    border: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-wine:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(114, 47, 55, 0.3);
+    color: var(--white);
+}
+
+.btn-outline-wine {
+    border: 2px solid var(--wine);
+    color: var(--wine);
+    border-radius: 40px;
+    padding: 8px 24px;
+    background: transparent;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-outline-wine:hover {
+    background: var(--wine);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-sm {
+    padding: 6px 20px;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 12px 40px;
+    font-size: 1.1rem;
+}
+
+/* Cards */
+.wine-card,
+.pairing-card,
+.subscription-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    background: var(--white);
+    overflow: hidden;
+    height: 100%;
+}
+
+.wine-card:hover,
+.pairing-card:hover,
+.subscription-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(114, 47, 55, 0.12);
+}
+
+/* Price Tags */
+.price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--green);
+}
+
+.price-sub {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--green);
+}
+
+/* Badges */
+.origin-badge {
+    background: #e8d9cc;
+    color: var(--wine);
+    border-radius: 30px;
+    padding: 4px 14px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.strength-badge {
+    background: #2c5f2d;
+    color: var(--white);
+    border-radius: 30px;
+    padding: 4px 14px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.currency-badge {
+    background: var(--gold);
+    color: var(--dark);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, #1a0f0f 0%, #3d2020 50%, #5a3028 100%);
+    color: var(--white);
+    padding: 100px 0;
+    margin-bottom: 50px;
+    border-radius: 0 0 50px 50px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero h1 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Filters */
+.filter-chip {
+    background: var(--white);
+    border-radius: 30px;
+    padding: 8px 20px;
+    margin: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #ddd;
+    display: inline-block;
+    font-size: 0.875rem;
+}
+
+.filter-chip.active,
+.filter-chip:hover {
+    background: var(--wine);
+    color: var(--white);
+    border-color: var(--wine);
+}
+
+/* Cart Icon */
+.cart-icon {
+    position: relative;
+    color: var(--wine);
+    text-decoration: none;
+    font-size: 1.3rem;
+    transition: all 0.2s ease;
+}
+
+.cart-icon:hover {
+    color: var(--wine-light);
+}
+
+.cart-count {
+    position: absolute;
+    top: -12px;
+    right: -18px;
+    background: var(--gold);
+    color: var(--dark);
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* Club Banner */
+.club-banner {
+    background: linear-gradient(135deg, var(--wine), var(--gold));
+    color: var(--white);
+    border-radius: 20px;
+    padding: 50px;
+    text-align: center;
+    margin: 40px 0;
+}
+
+.club-banner h3 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+/* Testimonials */
+.testimonial {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.testimonial:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stars {
+    color: var(--gold);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+/* Forms */
+.form-control,
+.form-select {
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    padding: 12px 16px;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--wine);
+    box-shadow: 0 0 0 3px rgba(114, 47, 55, 0.1);
+    outline: none;
+}
+
+/* Cart Items */
+.cart-item {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Checkout */
+.checkout-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.payment-option {
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-option:hover {
+    border-color: var(--wine);
+    background: #fef5f0;
+}
+
+.payment-option.selected {
+    border-color: var(--wine);
+    background: #fef5f0;
+}
+
+/* Footer */
+footer {
+    background: var(--dark);
+    color: #aaa;
+    margin-top: 60px;
+    padding: 60px 0 40px;
+}
+
+footer a {
+    color: #aaa;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+footer a:hover {
+    color: var(--gold);
+}
+
+footer hr {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 30px 0;
+}
+
+/* Loading Spinner */
+.loading {
+    text-align: center;
+    padding: 60px;
+    font-size: 1.1rem;
+    color: var(--wine);
+}
+
+.loading i {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--green);
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 40px;
+    z-index: 9999;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero {
+        padding: 60px 0;
+    }
+    
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+    
+    .club-banner {
+        padding: 30px;
+    }
+    
+    .club-banner h3 {
+        font-size: 1.3rem;
+    }
+    
+    .testimonial {
+        margin: 10px 0;
+    }
+    
+    .navbar-brand {
+        font-size: 1.3rem;
+    }
+    
+    .price {
+        font-size: 1.2rem;
+    }
+    
+    .price-sub {
+        font-size: 1.5rem;
+    }
+    
+    .filter-chip {
+        padding: 5px 12px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Utility Classes */
+.text-wine { color: var(--wine); }
+.bg-wine { background: var(--wine); }
+.text-gold { color: var(--gold); }
+.bg-gold { background: var(--gold); }
+
+.cursor-pointer { cursor: pointer; }
+.rounded-20 { border-radius: 20px; }
+.shadow-hover:hover { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); }

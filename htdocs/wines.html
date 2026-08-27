@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Wines - Wine & Co.</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --wine: #722f37; --green: #1a6b3c; }
+        body { background: #f5ede6; font-family: 'Segoe UI', system-ui; }
+        .navbar { background: white; border-bottom: 2px solid #c9a03d; }
+        .navbar-brand { color: var(--wine) !important; font-size: 1.8rem; font-weight: 700; }
+        .btn-wine { background: var(--wine); color: white; border-radius: 40px; padding: 8px 28px; border: none; }
+        .btn-wine:hover { background: #5a232a; }
+        .wine-card { border: none; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); background: white; padding: 20px; text-align: center; height: 100%; }
+        .price { font-size: 1.5rem; font-weight: bold; color: var(--green); }
+        .cart-badge { position: fixed; bottom: 20px; right: 20px; background: var(--wine); color: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; }
+        .cart-badge span { background: #ffc107; color: #333; border-radius: 50%; padding: 2px 7px; font-size: 13px; position: absolute; top: -5px; right: -5px; }
+        footer { background: #1a1a2e; color: #aaa; margin-top: 60px; padding: 50px 0; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top py-2">
+        <div class="container">
+            <a class="navbar-brand" href="index.html"><i class="fas fa-wine-bottle me-2"></i>Wine & Co. <span>Eswatini</span></a>
+            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto gap-3">
+                    <li><a class="nav-link" href="index.html">Home</a></li>
+                    <li><a class="nav-link" href="wines.html">Wines</a></li>
+                    <li><a class="nav-link" href="pairings.html">Pairings</a></li>
+                    <li><a class="nav-link" href="subscription.html">Subscribe</a></li>
+                </ul>
+                <a class="nav-link" href="#" onclick="showCart()"><i class="fas fa-shopping-cart fa-lg"></i><span id="cartCount">0</span></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Our Wine Collection</h2>
+        <div class="row" id="allWines"></div>
+    </div>
+
+    <footer><div class="container text-center"><p>© 2025 Wine & Co. — All prices in Swaziland Lilangeni (E/SZL)</p></div></footer>
+    <div class="cart-badge" onclick="showCart()"><i class="fas fa-shopping-cart fa-lg"></i><span id="cartCount2">0</span></div>
+
+    <script>
+        const API_URL = 'backend/';
+        
+        async function loadWines() {
+            try {
+                const res = await fetch(API_URL + 'get-wines.php');
+                const wines = await res.json();
+                document.getElementById('allWines').innerHTML = wines.map(w => `
+                    <div class="col-md-4 mb-4">
+                        <div class="wine-card">
+                            <i class="fas fa-wine-bottle fa-3x mb-3" style="color:#722f37;"></i>
+                            <h5>${w.name}</h5>
+                            <p class="text-muted">${w.variety} • ${w.vintage}</p>
+                            <div class="price">E${parseFloat(w.price).toFixed(2)}</div>
+                            <button class="btn btn-wine btn-sm mt-2" onclick="addToCart(${w.id}, '${w.name}', ${w.price})">Add to Cart</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch(e) {
+                document.getElementById('allWines').innerHTML = '<div class="col-12 text-center">Error loading wines</div>';
+            }
+        }
+
+        function addToCart(id, name, price) {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.push({ id, name, price, quantity: 1 });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            alert(`✓ Added ${name} to cart!`);
+        }
+
+        function updateCartCount() {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            document.getElementById('cartCount').innerText = cart.length;
+            document.getElementById('cartCount2').innerText = cart.length;
+        }
+
+        function showCart() {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cart.length === 0) { alert("Cart is empty"); return; }
+            let msg = "🛒 YOUR CART:\n\n";
+            let total = 0;
+            cart.forEach(i => { total += i.price * i.quantity; msg += `• ${i.name} x${i.quantity} = E${(i.price * i.quantity).toFixed(2)}\n`; });
+            msg += `\nTOTAL: E${total.toFixed(2)}\n\nProceed to checkout?`;
+            if (confirm(msg)) {
+                alert("Order placed! (Demo mode)");
+                localStorage.removeItem('cart');
+                updateCartCount();
+            }
+        }
+
+        loadWines();
+        updateCartCount();
+    </script>
+</body>
+</html>

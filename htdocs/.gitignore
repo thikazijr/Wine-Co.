@@ -1,0 +1,13 @@
+# User-uploaded proof-of-payment files (runtime data, not part of codebase)
+uploads/pop/
+
+# Magazine PDF (too large for git - upload separately to server)
+downloads/*.pdf
+
+# Database dump files (never commit DB dumps to a repo)
+*.sql
+
+# OS & editor junk
+.DS_Store
+Thumbs.db
+.vscode/
