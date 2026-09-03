@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Subscriber } from '@/lib/types';
 import { sendEmail } from '@/lib/email';
+import { addOrderToStore, AdminOrder } from '@/app/api/orders/route';
 
 // In-memory fallback subscriber store for instant state reactivity
 let subscribersStore: Subscriber[] = [
@@ -114,8 +115,31 @@ export async function POST(request: Request) {
       city: city || 'Eswatini',
     };
 
-    // Store in memory
+    // Store subscriber in memory
     subscribersStore = [newSub, ...subscribersStore];
+
+    // Automatically create a Pending Delivery Order for the VIP Box
+    const bottlesCount = planName?.includes('Elegance') ? 2 : planName?.includes('Voyager') ? 4 : planName?.includes('Grand Reserve') ? 12 : 6;
+    const vipOrderNumber = `ORD-VIP-${Date.now().toString().slice(-6)}`;
+    const vipDeliveryOrder: AdminOrder = {
+      id: `ord_vip_${Date.now()}`,
+      orderNumber: vipOrderNumber,
+      customerName: newSub.fullName,
+      email: newSub.email,
+      phone: newSub.phone,
+      address: address || '',
+      city: city || 'Eswatini',
+      total: newSub.price,
+      itemsCount: bottlesCount,
+      itemsDescription: `${planName || 'VIP Club Box'} (${bottlesCount} bottles) - Monthly Delivery`,
+      orderType: 'vip_box',
+      status: 'pending',
+      paymentMethod: paymentMethod || 'MTN MoMo',
+      date: new Date().toISOString().split('T')[0],
+      notes: `VIP Club Box Delivery to ${address || 'customer address'}, ${city || 'Eswatini'}. Driver Contact: ${newSub.phone}`,
+    };
+
+    addOrderToStore(vipDeliveryOrder);
 
     // Record in Supabase if configured
     if (isSupabaseConfigured && supabase) {
@@ -133,8 +157,22 @@ export async function POST(request: Request) {
           payment_status: 'paid',
           status: 'active',
         });
+
+        // Also insert pending delivery order into orders table
+        await supabase.from('orders').insert({
+          order_number: vipDeliveryOrder.orderNumber,
+          customer_name: vipDeliveryOrder.customerName,
+          customer_email: vipDeliveryOrder.email,
+          customer_phone: vipDeliveryOrder.phone,
+          customer_address: vipDeliveryOrder.address,
+          city: vipDeliveryOrder.city,
+          total: vipDeliveryOrder.total,
+          status: 'pending',
+          payment_method: vipDeliveryOrder.paymentMethod,
+          notes: vipDeliveryOrder.notes,
+        });
       } catch (dbErr) {
-        console.error('Supabase subscription insert error:', dbErr);
+        console.error('Supabase subscription & order insert error:', dbErr);
       }
     }
 
