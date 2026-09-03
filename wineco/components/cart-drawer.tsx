@@ -13,6 +13,7 @@ export function CartDrawer() {
     setIsDrawerOpen,
     updateQuantity,
     removeFromCart,
+    clearCart,
     subtotal,
     deliveryFee,
     grandTotal,

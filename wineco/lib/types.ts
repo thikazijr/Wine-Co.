@@ -96,3 +96,26 @@ export interface Order {
   receipt_number?: string;
   created_at?: string;
 }
+
+export interface Subscriber {
+  id: string | number;
+  fullName: string;
+  email: string;
+  phone: string;
+  planName: string;
+  price: number;
+  status: 'active' | 'cancelled' | 'paused';
+  paymentMethod: string;
+  startDate: string;
+  address?: string;
+  city?: string;
+}
+
+export interface PortalLoginLog {
+  id: string | number;
+  email: string;
+  role: 'admin' | 'staff' | 'member' | 'customer';
+  timestamp: string;
+  ip?: string;
+  status: 'success' | 'failed';
+}

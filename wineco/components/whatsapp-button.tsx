@@ -19,7 +19,7 @@ export function WhatsAppButton() {
     >
       <MessageCircle className="w-6 h-6 fill-current" />
       <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 ease-in-out text-sm font-semibold pr-1">
-        Chat with Sommelier
+        Chat with Us
       </span>
     </a>
   );

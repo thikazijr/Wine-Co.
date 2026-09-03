@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd wineco && npm install && npm run build",
+  "outputDirectory": "wineco/.next",
+  "framework": "nextjs"
+}

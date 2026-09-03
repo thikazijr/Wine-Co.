@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   ArrowRight,
   ShoppingBag,
+  Phone,
 } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 
@@ -30,6 +31,8 @@ export default function CheckoutPage() {
     notes: '',
   });
 
+  const isCOD = formData.paymentMethod === 'cash_on_delivery';
+
   if (cart.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-4">
@@ -44,6 +47,13 @@ export default function CheckoutPage() {
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Extra validation for CoD: phone is required
+    if (isCOD && !formData.phone.trim()) {
+      showToast('📞 Please enter your phone number for cash on delivery.');
+      return;
+    }
+
     setSubmitting(true);
 
     const orderNumber = `ORD-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -88,7 +98,27 @@ export default function CheckoutPage() {
 
       localStorage.setItem('wineco_last_order', JSON.stringify(orderSummary));
       clearCart();
-      showToast(`Order ${orderNumber} placed successfully!`);
+      showToast(`🍷 Order ${orderNumber} placed successfully!`);
+
+      // Send WhatsApp notification to customer
+      if (formData.phone.trim()) {
+        const itemsSummary = cart
+          .map((i) => `• ${i.product_name} ×${i.quantity}`)
+          .join('%0A');
+        const payMethod = formData.paymentMethod.replace(/_/g, ' ').toUpperCase();
+        const waMessage =
+          `🍷 *Wine %26 Co Order Confirmed!*%0A%0A` +
+          `📦 *Order Reference:* ${orderNumber}%0A` +
+          `👤 *Name:* ${encodeURIComponent(formData.fullName)}%0A` +
+          `📍 *Delivery:* ${encodeURIComponent(formData.address)}, ${formData.city}%0A` +
+          `💳 *Payment:* ${payMethod}%0A%0A` +
+          `*Items Ordered:*%0A${itemsSummary}%0A%0A` +
+          `💰 *Total Due:* E${grandTotal.toFixed(2)}%0A%0A` +
+          `Our team will contact you shortly to confirm your delivery time. Thank you for choosing Wine %26 Co! 🥂`;
+        const cleanPhone = formData.phone.replace(/[\s\-\(\)]/g, '');
+        window.open(`https://wa.me/${cleanPhone}?text=${waMessage}`, '_blank');
+      }
+
       router.push(`/order-confirmation?order=${orderNumber}`);
     } catch (err) {
       console.error('Order placement fallback', err);
@@ -110,6 +140,26 @@ export default function CheckoutPage() {
 
       localStorage.setItem('wineco_last_order', JSON.stringify(orderSummary));
       clearCart();
+
+      // Send WhatsApp notification to customer (fallback)
+      if (formData.phone.trim()) {
+        const itemsSummary = cart
+          .map((i) => `• ${i.product_name} ×${i.quantity}`)
+          .join('%0A');
+        const payMethod = formData.paymentMethod.replace(/_/g, ' ').toUpperCase();
+        const waMessage =
+          `🍷 *Wine %26 Co Order Confirmed!*%0A%0A` +
+          `📦 *Order Reference:* ${orderNumber}%0A` +
+          `👤 *Name:* ${encodeURIComponent(formData.fullName)}%0A` +
+          `📍 *Delivery:* ${encodeURIComponent(formData.address)}, ${formData.city}%0A` +
+          `💳 *Payment:* ${payMethod}%0A%0A` +
+          `*Items Ordered:*%0A${itemsSummary}%0A%0A` +
+          `💰 *Total Due:* E${grandTotal.toFixed(2)}%0A%0A` +
+          `Our team will contact you shortly to confirm your delivery time. Thank you for choosing Wine %26 Co! 🥂`;
+        const cleanPhone = formData.phone.replace(/[\s\-\(\)]/g, '');
+        window.open(`https://wa.me/${cleanPhone}?text=${waMessage}`, '_blank');
+      }
+
       router.push(`/order-confirmation?order=${orderNumber}`);
     } finally {
       setSubmitting(false);
@@ -173,15 +223,31 @@ export default function CheckoutPage() {
                   <div>
                     <label className="block font-semibold text-[#2c1a1a] mb-1">
                       Phone Number <span className="text-red-500">*</span>
+                      {isCOD && (
+                        <span className="ml-1 text-[#722f37] font-bold">(Required for CoD)</span>
+                      )}
                     </label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="+268 7838 1971"
-                      className="w-full p-3.5 bg-[#faf6f0] border border-[#e8e0d8] rounded-xl focus:outline-none focus:border-[#722f37]"
-                    />
+                    <div className="relative">
+                      <Phone className={`w-3.5 h-3.5 absolute left-3.5 top-4 ${isCOD ? 'text-[#722f37]' : 'text-neutral-400'}`} />
+                      <input
+                        type="tel"
+                        required
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="+268 7838 1971"
+                        className={`w-full pl-9 pr-3 py-3.5 bg-[#faf6f0] border rounded-xl focus:outline-none transition-colors ${
+                          isCOD
+                            ? 'border-[#722f37] focus:border-[#722f37] bg-red-50/30'
+                            : 'border-[#e8e0d8] focus:border-[#722f37]'
+                        }`}
+                      />
+                    </div>
+                    {isCOD && (
+                      <p className="mt-1.5 text-[11px] text-[#722f37] font-semibold flex items-center gap-1">
+                        <Phone className="w-3 h-3" />
+                        Our driver will call this number to confirm your delivery location.
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -257,13 +323,28 @@ export default function CheckoutPage() {
                     onChange={() => {}}
                     className="mt-1 text-[#722f37] focus:ring-[#722f37]"
                   />
-                  <div>
+                  <div className="flex-1 space-y-2">
                     <strong className="block text-sm font-bold text-[#2c1a1a]">
                       💵 Cash on Delivery
                     </strong>
                     <span className="text-neutral-500">
                       Pay with cash or local POS card terminal when our courier hands over your wine.
                     </span>
+
+                    {/* CoD Phone Callout */}
+                    {formData.paymentMethod === 'cash_on_delivery' && (
+                      <div className="mt-2 bg-amber-50 border border-amber-300 rounded-xl p-3 flex items-start gap-2.5">
+                        <Phone className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-bold text-amber-900 text-[11px]">
+                            📞 Phone number required for Cash on Delivery
+                          </p>
+                          <p className="text-amber-800 text-[11px] mt-0.5">
+                            Your delivery driver will call you to confirm your exact location and arrange handover. Please ensure your phone number above is correct and reachable.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </label>
 
@@ -442,7 +523,7 @@ export default function CheckoutPage() {
             <div className="pt-2 text-[11px] text-neutral-500 space-y-1 text-center">
               <p className="flex items-center justify-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Encrypted Order Processing & Confirmation Email</span>
+                <span>Encrypted Order Processing & WhatsApp Confirmation</span>
               </p>
               <p>Adult signature (18+) required upon doorstep delivery.</p>
             </div>

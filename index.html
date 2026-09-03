@@ -16,6 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -682,8 +683,14 @@
                 <input type="email" id="chkEmail" placeholder="siphiwo@example.com" class="w-full p-3 bg-[#faf6f0] border border-[#e8e0d8] rounded-xl">
               </div>
               <div>
-                <label class="block font-bold text-[#2c1a1a] mb-1">Phone Number *</label>
-                <input type="tel" id="chkPhone" placeholder="+268 7838 1971" class="w-full p-3 bg-[#faf6f0] border border-[#e8e0d8] rounded-xl">
+                <label class="block font-bold text-[#2c1a1a] mb-1 flex items-center justify-between">
+                  <span>Phone Number *</span>
+                  <span id="codPhoneLabelTag" class="text-[#722f37] font-semibold text-[10px]">(Driver will call for directions)</span>
+                </label>
+                <input type="tel" id="chkPhone" placeholder="+268 7838 1971" class="w-full p-3 bg-[#faf6f0] border border-[#e8e0d8] rounded-xl transition-colors">
+                <p id="codPhoneHelpText" class="text-[10px] text-[#722f37] mt-1 font-medium flex items-center gap-1">
+                  <i class="fa-solid fa-phone text-[9px]"></i> Required so our courier can call you to locate your delivery point.
+                </p>
               </div>
             </div>
             <div>
@@ -694,25 +701,43 @@
 
           <h3 class="font-serif font-bold text-lg text-[#722f37] border-b border-[#f0ece8] pb-2 pt-2">2. Payment Method</h3>
           <div class="space-y-3 text-xs">
-            <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-[#722f37] bg-[#faf6f0] cursor-pointer">
-              <input type="radio" name="chkPayMethod" value="cash" checked class="text-[#722f37]">
-              <div>
-                <strong class="block text-[#2c1a1a]">💵 Cash on Delivery</strong>
-                <span class="text-neutral-500">Pay cash or with card terminal upon doorstep courier delivery.</span>
+            <label class="block p-4 rounded-xl border-2 border-[#722f37] bg-[#faf6f0] cursor-pointer transition-all" id="labelPayCash">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="chkPayMethod" value="cash" checked onchange="handlePaymentMethodChange(this.value)" class="text-[#722f37]">
+                <div>
+                  <strong class="block text-[#2c1a1a]">💵 Cash on Delivery</strong>
+                  <span class="text-neutral-500">Pay cash or with card terminal upon doorstep courier delivery.</span>
+                </div>
+              </div>
+              <!-- CoD Notice Alert Box -->
+              <div id="codNoticeBox" class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-[11px] space-y-1">
+                <p class="font-bold flex items-center gap-1.5 text-amber-900">
+                  <i class="fa-solid fa-phone-volume text-amber-700"></i>
+                  <span>Phone Number Required for Courier Directions</span>
+                </p>
+                <p class="text-amber-800 leading-relaxed text-[11px]">
+                  Our delivery driver will call your phone number directly before arrival to confirm directions to your location. Please ensure the phone number above is accurate.
+                </p>
               </div>
             </label>
-            <label class="flex items-center gap-3 p-4 rounded-xl border border-[#e8e0d8] bg-white cursor-pointer hover:border-[#c9a03d]">
-              <input type="radio" name="chkPayMethod" value="bank" class="text-[#722f37]">
-              <div>
-                <strong class="block text-[#2c1a1a]">🏦 Direct Bank Transfer (EFT)</strong>
-                <span class="text-neutral-500">Standard Bank Eswatini • Acc: 9110004928172</span>
+
+            <label class="block p-4 rounded-xl border border-[#e8e0d8] bg-white cursor-pointer hover:border-[#c9a03d] transition-all" id="labelPayBank">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="chkPayMethod" value="bank" onchange="handlePaymentMethodChange(this.value)" class="text-[#722f37]">
+                <div>
+                  <strong class="block text-[#2c1a1a]">🏦 Direct Bank Transfer (EFT)</strong>
+                  <span class="text-neutral-500">Standard Bank Eswatini • Acc: 9110004928172</span>
+                </div>
               </div>
             </label>
-            <label class="flex items-center gap-3 p-4 rounded-xl border border-[#e8e0d8] bg-white cursor-pointer hover:border-[#c9a03d]">
-              <input type="radio" name="chkPayMethod" value="stripe" class="text-[#722f37]">
-              <div>
-                <strong class="block text-[#2c1a1a]">💳 Credit / Debit Card (Stripe 256-Bit SSL)</strong>
-                <span class="text-neutral-500">Instant online card payment.</span>
+
+            <label class="block p-4 rounded-xl border border-[#e8e0d8] bg-white cursor-pointer hover:border-[#c9a03d] transition-all" id="labelPayStripe">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="chkPayMethod" value="stripe" onchange="handlePaymentMethodChange(this.value)" class="text-[#722f37]">
+                <div>
+                  <strong class="block text-[#2c1a1a]">💳 Credit / Debit Card (Stripe 256-Bit SSL)</strong>
+                  <span class="text-neutral-500">Instant online card payment.</span>
+                </div>
               </div>
             </label>
           </div>
@@ -729,7 +754,107 @@
               <span>Total:</span><span id="chkTotal" class="text-xl text-[#1a6b3c]">E0.00</span>
             </div>
           </div>
-          <button onclick="placeOrder()" class="btn-wine w-full py-4 text-sm font-bold shadow-xl">Complete Order</button>
+          <button onclick="placeOrder()" class="btn-wine w-full py-4 text-sm font-bold shadow-xl flex items-center justify-center gap-2">
+            <i class="fa-solid fa-lock text-xs"></i>
+            <span>Complete Order & Get Pass</span>
+          </button>
+          <p class="text-[11px] text-neutral-400 text-center flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-bell text-[#c9a03d]"></i> Instant confirmation sent to your WhatsApp & phone
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 8.5: ORDER CONFIRMATION & DELIVERY VERIFICATION PASS -->
+    <div id="page-order-confirmation" class="page-view hidden max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 animate-in fade-in">
+      <!-- Success Badge -->
+      <div class="bg-white rounded-3xl p-8 md:p-10 border-2 border-emerald-500 shadow-xl text-center space-y-4">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-inner">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div>
+          <span class="text-xs font-bold text-[#c9a03d] uppercase tracking-widest">Order Successfully Received</span>
+          <h1 class="text-2xl md:text-3xl font-serif font-bold text-[#2c1a1a] mt-1">Thank You for Your Order!</h1>
+          <p class="text-xs text-neutral-600 max-w-md mx-auto mt-1" id="orderConfirmSubtitle">
+            Your wine has been reserved and our sommelier team is preparing your package. A WhatsApp confirmation notification has been prepared for you.
+          </p>
+        </div>
+        <div class="inline-block bg-[#faf6f0] border border-[#e8e0d8] rounded-2xl px-5 py-2.5 text-xs">
+          <span class="text-neutral-500 block text-[10px] uppercase font-bold tracking-wider">Order Reference</span>
+          <span class="text-xl font-mono font-bold text-[#722f37]" id="confirmOrderRef">ORD-123456</span>
+        </div>
+      </div>
+
+      <!-- DELIVERY VERIFICATION PASS (QR CODE + SECURITY TOKEN) -->
+      <div class="bg-[#1a0f0f] text-white rounded-3xl p-6 md:p-8 border-2 border-[#c9a03d] shadow-2xl space-y-6 relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#c9a03d]/30 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-[#722f37] rounded-xl flex items-center justify-center border border-[#c9a03d] text-[#c9a03d] text-lg">
+              <i class="fa-solid fa-qrcode"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-serif font-bold text-[#c9a03d]">Delivery Verification Pass</h2>
+              <p class="text-[11px] text-white/70">Proof of recipient for your Wine & Co. delivery courier</p>
+            </div>
+          </div>
+          <span class="bg-[#c9a03d]/20 text-[#c9a03d] border border-[#c9a03d]/40 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full w-max">
+            Official Recipient Proof
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          <!-- QR Code Canvas -->
+          <div class="md:col-span-4 flex flex-col items-center justify-center bg-white p-4 rounded-2xl shadow-lg">
+            <div id="confirmQrCodeCanvas" class="flex items-center justify-center"></div>
+            <span class="text-[10px] font-mono text-neutral-500 mt-2 text-center">Scan to verify recipient</span>
+          </div>
+
+          <!-- Token & Customer Order Details -->
+          <div class="md:col-span-8 space-y-4 text-xs">
+            <div class="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
+              <span class="text-[10px] text-[#c9a03d] uppercase font-bold tracking-wider block">Unique Security Handover Token</span>
+              <div class="flex items-center gap-3">
+                <span class="text-3xl font-mono font-extrabold text-[#c9a03d] tracking-widest" id="confirmSecurityToken">WN-9482</span>
+                <span class="text-[10px] text-white/60">(Show this code or QR code to the driver upon delivery)</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-white/90">
+              <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                <span class="text-white/50 text-[10px] block uppercase font-bold">Recipient</span>
+                <strong id="confirmCustomerName" class="text-white block mt-0.5 text-xs truncate">—</strong>
+                <span id="confirmCustomerPhone" class="text-[#c9a03d] block text-[11px] font-mono mt-0.5">—</span>
+              </div>
+              <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                <span class="text-white/50 text-[10px] block uppercase font-bold">Total Amount Due</span>
+                <strong id="confirmOrderTotal" class="text-emerald-400 block mt-0.5 text-base font-bold">E0.00</strong>
+                <span id="confirmPayMethod" class="text-white/70 block text-[10px] uppercase mt-0.5 font-semibold">Cash on Delivery</span>
+              </div>
+            </div>
+
+            <div class="bg-[#722f37]/40 border border-[#722f37] rounded-xl p-3 text-[11px] text-white/90 flex items-start gap-2.5">
+              <i class="fa-solid fa-shield-halved text-[#c9a03d] text-base mt-0.5"></i>
+              <div>
+                <strong class="text-white block">Proof of Recipient Protection:</strong>
+                <span>The driver cross-references this exact token and QR scan with their manifest to confirm they are delivering to the rightful owner.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
+          <button onclick="window.print()" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 transition-colors">
+            <i class="fa-solid fa-print"></i>
+            <span>Print Delivery Pass</span>
+          </button>
+          <button onclick="openWhatsAppNotification()" class="btn-gold px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 shadow-lg">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+            <span>Open WhatsApp Confirmation</span>
+          </button>
+          <button onclick="switchPage('shop')" class="btn-wine px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2">
+            <span>Continue Shopping</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
         </div>
       </div>
     </div>
@@ -749,30 +874,37 @@
       <!-- Quick Preset Demo Logins for easy 1-click access -->
       <div class="bg-white rounded-3xl p-6 md:p-8 border border-[#f0ece8] shadow-xl space-y-6">
         <div class="space-y-2">
-          <span class="text-[11px] font-bold text-[#722f37] uppercase tracking-wider block">One-Click Quick Logins:</span>
+          <span class="text-[11px] font-bold text-[#722f37] uppercase tracking-wider block">Select Your Portal — Credentials Required:</span>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <button type="button" onclick="quickLogin('admin')" class="p-3 rounded-2xl border-2 border-[#722f37]/20 hover:border-[#722f37] bg-[#faf6f0] hover:bg-[#722f37] hover:text-white transition-all text-left group">
+            <button type="button" onclick="prefillAndFocusLogin('admin')" class="p-3 rounded-2xl border-2 border-[#722f37]/20 hover:border-[#722f37] bg-[#faf6f0] hover:bg-[#722f37] hover:text-white transition-all text-left group">
               <div class="font-bold flex items-center gap-1.5 text-[#722f37] group-hover:text-white">
                 <i class="fa-solid fa-crown text-[#c9a03d]"></i>
                 <span>Admin Portal</span>
               </div>
               <span class="text-[10px] text-neutral-500 group-hover:text-white/80 block mt-1">Full Store Management</span>
+              <span class="text-[9px] text-neutral-400 group-hover:text-white/60 block mt-0.5 font-mono">admin@wineco.sz</span>
             </button>
-            <button type="button" onclick="quickLogin('staff')" class="p-3 rounded-2xl border-2 border-[#722f37]/20 hover:border-[#722f37] bg-[#faf6f0] hover:bg-[#722f37] hover:text-white transition-all text-left group">
+            <button type="button" onclick="prefillAndFocusLogin('staff')" class="p-3 rounded-2xl border-2 border-[#722f37]/20 hover:border-[#722f37] bg-[#faf6f0] hover:bg-[#722f37] hover:text-white transition-all text-left group">
               <div class="font-bold flex items-center gap-1.5 text-[#722f37] group-hover:text-white">
                 <i class="fa-solid fa-clipboard-check text-blue-600"></i>
                 <span>Staff / Sommelier</span>
               </div>
               <span class="text-[10px] text-neutral-500 group-hover:text-white/80 block mt-1">Dispatch & Packing</span>
+              <span class="text-[9px] text-neutral-400 group-hover:text-white/60 block mt-0.5 font-mono">staff@wineco.sz</span>
             </button>
-            <button type="button" onclick="quickLogin('member')" class="p-3 rounded-2xl border-2 border-[#c9a03d]/40 hover:border-[#c9a03d] bg-[#faf6f0] hover:bg-[#1a0f0f] hover:text-white transition-all text-left group">
+            <button type="button" onclick="prefillAndFocusLogin('member')" class="p-3 rounded-2xl border-2 border-[#c9a03d]/40 hover:border-[#c9a03d] bg-[#faf6f0] hover:bg-[#1a0f0f] hover:text-white transition-all text-left group">
               <div class="font-bold flex items-center gap-1.5 text-[#c9a03d] group-hover:text-[#c9a03d]">
                 <i class="fa-solid fa-wine-glass"></i>
                 <span>VIP Club Member</span>
               </div>
               <span class="text-[10px] text-neutral-500 group-hover:text-white/80 block mt-1">Monthly Box Lounge</span>
+              <span class="text-[9px] text-neutral-400 group-hover:text-white/60 block mt-0.5 font-mono">member@wineco.sz</span>
             </button>
           </div>
+          <p class="text-[10px] text-neutral-400 mt-1 flex items-center gap-1">
+            <i class="fa-solid fa-lock text-[9px] text-[#c9a03d]"></i>
+            Clicking a portal tile pre-fills credentials — <strong>your password is still required to proceed.</strong>
+          </p>
         </div>
 
         <div class="relative flex items-center justify-center border-t border-[#f0ece8] pt-4">
@@ -823,42 +955,212 @@
         </div>
       </div>
 
+      <!-- Dynamic KPI Metric Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm">
-          <span class="text-neutral-500 uppercase font-bold block">Gross Revenue (Month)</span>
-          <span class="text-2xl font-bold text-[#1a6b3c] block mt-1">E18,450.00</span>
-          <span class="text-[10px] text-emerald-600 mt-1 block">↑ 18.5% from last month</span>
+        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm space-y-1">
+          <span class="text-neutral-500 uppercase font-bold block text-[10px]">Gross Sales & Revenue</span>
+          <span class="text-2xl font-extrabold text-[#1a6b3c] block" id="adminGrossRevEl">E24,890.00</span>
+          <span class="text-[10px] text-neutral-500 block" id="adminRevenueSubtext">Includes inventory sales & active club dues</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm">
-          <span class="text-neutral-500 uppercase font-bold block">Cellar Inventory</span>
-          <span class="text-2xl font-bold text-[#722f37] block mt-1">174 Bottles</span>
-          <span class="text-[10px] text-neutral-500 mt-1 block">Across 12 imported vintages</span>
+        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm space-y-1">
+          <span class="text-neutral-500 uppercase font-bold block text-[10px]">Total Stock Available</span>
+          <span class="text-2xl font-extrabold text-[#722f37] block" id="adminTotalStockEl">186 Bottles</span>
+          <span class="text-[10px] text-neutral-500 block" id="adminStockValuation">Cellar Valuation: E98,420.00</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm">
-          <span class="text-neutral-500 uppercase font-bold block">Active Club Subscribers</span>
-          <span class="text-2xl font-bold text-[#c9a03d] block mt-1">28 Members</span>
-          <span class="text-[10px] text-neutral-500 mt-1 block">14 Vineyard Voyager, 8 Elegance</span>
+        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm space-y-1">
+          <span class="text-neutral-500 uppercase font-bold block text-[10px]">Active Subscriptions</span>
+          <span class="text-2xl font-extrabold text-[#c9a03d] block" id="adminActiveSubsEl">4 Members</span>
+          <span class="text-[10px] text-emerald-600 block font-semibold" id="adminSubsMrr">E8,496.00 / month MRR</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm">
-          <span class="text-neutral-500 uppercase font-bold block">Magazine PDF Sales</span>
-          <span class="text-2xl font-bold text-blue-700 block mt-1">39 Downloads</span>
-          <span class="text-[10px] text-neutral-500 mt-1 block">E45.00 / edition</span>
+        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm space-y-1">
+          <span class="text-neutral-500 uppercase font-bold block text-[10px]">Captured Portal Emails</span>
+          <span class="text-2xl font-extrabold text-blue-700 block" id="adminCapturedEmailsEl">5 Registered</span>
+          <span class="text-[10px] text-neutral-500 block">Real-time login & VIP tracking</span>
         </div>
       </div>
 
+      <!-- SECTION 1: WINE CELLAR INVENTORY & STOCK MANAGEMENT -->
       <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-4">
-        <div class="flex items-center justify-between">
-          <h3 class="font-serif font-bold text-base text-[#2c1a1a]">Cellar Inventory Management (12 Wines)</h3>
-          <button onclick="showToast('Inventory synchronised with Eswatini climate depot!')" class="btn-wine text-xs px-3.5 py-1.5">
-            <i class="fa-solid fa-rotate mr-1"></i> Sync Inventory
-          </button>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#e8e0d8] pb-3">
+          <div>
+            <h3 class="font-serif font-bold text-base text-[#2c1a1a] flex items-center gap-2">
+              <i class="fa-solid fa-wine-bottle text-[#722f37]"></i>
+              <span>Cellar Inventory Management</span>
+            </h3>
+            <p class="text-[11px] text-neutral-500">Edit, increment/decrement stock levels, or insert new wine stock</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleInsertStockForm()" class="btn-wine text-xs px-3.5 py-1.5 flex items-center gap-1.5 shadow">
+              <i class="fa-solid fa-plus"></i>
+              <span>Insert New Stock</span>
+            </button>
+          </div>
         </div>
+
+        <!-- Insert New Stock Form Modal (Hidden by default) -->
+        <div id="insertStockForm" class="hidden p-4 rounded-2xl bg-[#faf6f0] border-2 border-[#c9a03d] space-y-3">
+          <div class="flex justify-between items-center border-b pb-2">
+            <h4 class="font-serif font-bold text-xs text-[#722f37]">Add New Wine to Cellar Inventory</h4>
+            <button onclick="toggleInsertStockForm()" class="text-neutral-400 hover:text-neutral-700 text-sm">✕</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label class="block font-bold mb-1">Wine Name</label>
+              <input type="text" id="newWineName" placeholder="e.g. Rupert & Rothschild Baroness" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg">
+            </div>
+            <div>
+              <label class="block font-bold mb-1">Grape Variety</label>
+              <input type="text" id="newWineVariety" placeholder="e.g. Chardonnay" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg">
+            </div>
+            <div>
+              <label class="block font-bold mb-1">Origin</label>
+              <input type="text" id="newWineOrigin" placeholder="e.g. Franschhoek, South Africa" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label class="block font-bold mb-1">Price (E / SZL)</label>
+              <input type="number" id="newWinePrice" placeholder="380" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg font-bold text-[#1a6b3c]">
+            </div>
+            <div>
+              <label class="block font-bold mb-1">Initial Stock (Bottles)</label>
+              <input type="number" id="newWineStock" placeholder="24" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg font-bold">
+            </div>
+            <div>
+              <label class="block font-bold mb-1">Vintage</label>
+              <input type="number" id="newWineVintage" placeholder="2021" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg">
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 pt-1">
+            <button onclick="toggleInsertStockForm()" class="px-3 py-1.5 rounded-lg bg-neutral-200 text-neutral-700 text-xs font-semibold">Cancel</button>
+            <button onclick="submitNewWineStock()" class="btn-wine text-xs px-4 py-1.5 font-bold shadow">Save to Inventory</button>
+          </div>
+        </div>
+
         <div class="overflow-x-auto">
           <table class="w-full text-xs text-left">
-            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8]">
-              <tr><th class="p-3">Wine</th><th class="p-3">Variety</th><th class="p-3">Origin</th><th class="p-3">Price</th><th class="p-3">Stock Status</th></tr>
+            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
+              <tr>
+                <th class="p-3">Wine</th>
+                <th class="p-3">Variety</th>
+                <th class="p-3">Origin</th>
+                <th class="p-3">Price</th>
+                <th class="p-3">Available Stock</th>
+                <th class="p-3">Quick Stock Update</th>
+              </tr>
             </thead>
             <tbody id="adminWineTable" class="divide-y divide-[#f0ece8]"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECTION 2: SUBSCRIPTION MANAGEMENT (ACTIVATE / CANCEL) -->
+      <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#e8e0d8] pb-3">
+          <div>
+            <h3 class="font-serif font-bold text-base text-[#2c1a1a] flex items-center gap-2">
+              <i class="fa-solid fa-crown text-[#c9a03d]"></i>
+              <span>VIP Wine Club Subscriptions Management</span>
+            </h3>
+            <p class="text-[11px] text-neutral-500">Activate or cancel monthly subscriptions and track recurring revenues</p>
+          </div>
+          <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check"></i>
+            <span id="adminActiveBadge">4 Active Subscriptions</span>
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
+              <tr>
+                <th class="p-3">Subscriber Name</th>
+                <th class="p-3">Registered Email</th>
+                <th class="p-3">Plan Tier</th>
+                <th class="p-3">Monthly Rate</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminSubsTable" class="divide-y divide-[#f0ece8]"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECTION 3: REAL-TIME PORTAL LOGINS & VIP REGISTERED EMAILS -->
+      <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#e8e0d8] pb-3">
+          <div>
+            <h3 class="font-serif font-bold text-base text-[#2c1a1a] flex items-center gap-2">
+              <i class="fa-solid fa-envelope text-emerald-600"></i>
+              <span>Real-Time Portal Access & VIP Registered Emails</span>
+            </h3>
+            <p class="text-[11px] text-neutral-500">Live stream of captured user emails from site logins and VIP Member Lounge registrations</p>
+          </div>
+          <button onclick="renderAdminAll(); showToast('Real-time database records refreshed!')" class="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors">
+            <i class="fa-solid fa-rotate text-[#c9a03d]"></i>
+            <span>Refresh Real-Time Logs</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
+              <tr>
+                <th class="p-3">Registered Email</th>
+                <th class="p-3">Role / Channel</th>
+                <th class="p-3">Access Timestamp</th>
+                <th class="p-3">Location / Device</th>
+                <th class="p-3">Status</th>
+              </tr>
+            </thead>
+            <tbody id="adminEmailsTable" class="divide-y divide-[#f0ece8]"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SECTION 4: CUSTOMER ORDERS & DELIVERY FULFILMENT (PENDING & DONE TABS) -->
+      <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-5">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#e8e0d8] pb-4">
+          <div>
+            <h3 class="font-serif font-bold text-base text-[#2c1a1a] flex items-center gap-2">
+              <i class="fa-solid fa-boxes-packing text-[#722f37]"></i>
+              <span>Customer Orders & Delivery Manifest</span>
+            </h3>
+            <p class="text-[11px] text-neutral-500">Track pending deliveries, cross-check driver verification tokens, and mark completed orders</p>
+          </div>
+
+          <!-- Pending / Done Filter Sub-Tabs -->
+          <div class="flex items-center gap-2 bg-[#faf6f0] p-1.5 rounded-2xl border border-[#e8e0d8]">
+            <button onclick="setAdminOrderFilter('pending')" id="adminTabPendingOrders" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-amber-500 text-white shadow-sm">
+              <i class="fa-solid fa-clock"></i>
+              <span>Pending Orders</span>
+              <span id="adminPendingCountBadge" class="bg-white/30 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">2</span>
+            </button>
+            <button onclick="setAdminOrderFilter('done')" id="adminTabDoneOrders" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-neutral-600 hover:text-[#722f37]">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Done Orders</span>
+              <span id="adminDoneCountBadge" class="bg-neutral-200 text-neutral-700 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">3</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
+              <tr>
+                <th class="p-3">Order Ref</th>
+                <th class="p-3">Customer & Address</th>
+                <th class="p-3">Driver Contact</th>
+                <th class="p-3">Date</th>
+                <th class="p-3">Total Due</th>
+                <th class="p-3">Payment</th>
+                <th class="p-3">Security Token</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrdersTable" class="divide-y divide-[#f0ece8]"></tbody>
           </table>
         </div>
       </div>
@@ -1280,65 +1582,123 @@
   </div>
 
   <!-- ==================== FLOATING WHATSAPP CTA ==================== -->
-  <a href="https://wa.me/26878381971?text=Hello%20Wine%20%26%20Co.%20Eswatini!" target="_blank" class="fixed bottom-6 right-6 z-40 bg-[#25D366] text-white p-3.5 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center gap-2" aria-label="Chat on WhatsApp">
+  <a href="https://wa.me/26878381971?text=Hello%20Wine%20%26%20Co.%20Eswatini!" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-40 bg-[#25D366] text-white p-3.5 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center gap-2 group" aria-label="Chat on WhatsApp">
     <i class="fa-brands fa-whatsapp text-2xl"></i>
+    <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 text-xs font-bold pr-1">Chat with Us</span>
   </a>
 
   <!-- ==================== FOOTER ==================== -->
-  <footer class="bg-[#1a1a2e] text-[#a0a0b0] pt-12 pb-8 border-t-4 border-[#c9a03d] text-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-white/10">
-      <div class="space-y-3">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-[#722f37] rounded-lg overflow-hidden border border-[#c9a03d] p-0.5">
-            <img src="./htdocs/uploads/wines/logo1.jpg" alt="Wine & Co." class="w-full h-full object-cover rounded" onerror="this.onerror=null;this.src='./wineco/public/wines/logo.jpg'">
+  <footer class="bg-[#150d0e] text-[#a8a199] pt-14 pb-10 border-t-2 border-[#c9a03d]/40 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-10 border-b border-white/10">
+        
+        <!-- Brand & Socials -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-[#1a0f0f] rounded-xl overflow-hidden border-2 border-[#c9a03d] p-0.5 flex items-center justify-center shadow-md">
+              <img src="./htdocs/uploads/wines/logo1.jpg" alt="Wine & Co. Crest" class="w-full h-full object-cover rounded-lg" onerror="this.onerror=null;this.src='./wineco/public/wines/logo1.jpg'">
+            </div>
+            <div>
+              <h4 class="text-white font-serif font-bold text-base leading-tight">Wine & Co.</h4>
+              <span class="text-[9px] text-[#c9a03d] font-bold tracking-widest uppercase block">Eswatini</span>
+            </div>
           </div>
-          <h4 class="text-white font-serif font-bold text-base">Wine & Co. Eswatini</h4>
+          <p class="text-neutral-400 leading-relaxed text-[11px]">The kingdom's premier boutique wine purveyor. Hand-picked cellar collections, monthly surprise boxes, and sommelier corporate gifting.</p>
+          
+          <div class="pt-1">
+            <span class="text-[10px] font-semibold text-white/70 block mb-2">Connect With Us:</span>
+            <div class="flex items-center gap-2">
+              <a href="https://www.facebook.com/profile.php?id=61593933930355" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#1877F2] hover:text-white text-white/80 border border-white/10 flex items-center justify-center transition-colors" title="Facebook">
+                <i class="fa-brands fa-facebook-f text-xs"></i>
+              </a>
+              <a href="https://wa.me/26878381971?text=Hello%20Wine%20%26%20Co.%20Eswatini!" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#25D366] hover:text-white text-white/80 border border-white/10 flex items-center justify-center transition-colors" title="WhatsApp">
+                <i class="fa-brands fa-whatsapp text-xs"></i>
+              </a>
+              <a href="mailto:winecoeswatini@yahoo.com" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#722f37] hover:text-white text-white/80 border border-white/10 flex items-center justify-center transition-colors" title="Email">
+                <i class="fa-solid fa-envelope text-xs"></i>
+              </a>
+            </div>
+          </div>
         </div>
-        <p class="text-neutral-400 leading-relaxed">The kingdom's premier boutique wine purveyor. Hand-picked cellar collections, monthly surprise boxes, and sommelier corporate gifting.</p>
+
+        <!-- Cellar & Offerings -->
+        <div>
+          <h5 class="text-white font-serif font-bold text-sm mb-3">Cellar & Collections</h5>
+          <ul class="space-y-2 text-neutral-400 text-[11px]">
+            <li><a href="javascript:void(0)" onclick="switchPage('shop')" class="hover:text-[#c9a03d] transition-colors flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-[#c9a03d]"></i>Our Wine Cellar</a></li>
+            <li><a href="javascript:void(0)" onclick="switchPage('subscription')" class="hover:text-[#c9a03d] transition-colors flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-[#c9a03d]"></i>Wine Club Boxes</a></li>
+            <li><a href="javascript:void(0)" onclick="switchPage('pairings')" class="hover:text-[#c9a03d] transition-colors flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-[#c9a03d]"></i>Food Pairings</a></li>
+            <li><a href="javascript:void(0)" onclick="switchPage('corporate')" class="hover:text-[#c9a03d] transition-colors flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-[#c9a03d]"></i>Corporate Luxury Gifts</a></li>
+            <li><a href="javascript:void(0)" onclick="switchPage('baskets')" class="hover:text-[#c9a03d] transition-colors flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-[#c9a03d]"></i>Celebration Hampers</a></li>
+            <li><a href="javascript:void(0)" onclick="switchPage('magazine')" class="hover:text-[#c9a03d] transition-colors flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-[#c9a03d]"></i>Boutique Magazine (E45)</a></li>
+          </ul>
+        </div>
+
+        <!-- Logistics & Assurance -->
+        <div>
+          <h5 class="text-white font-serif font-bold text-sm mb-3">Concierge & Logistics</h5>
+          <div class="space-y-2 text-neutral-400 text-[11px]">
+            <p><i class="fa-solid fa-location-dot text-[#c9a03d] mr-1.5"></i>Mbabane • Manzini • Ezulwini • Matsapha & Nationwide</p>
+            <p><i class="fa-solid fa-clock text-[#c9a03d] mr-1.5"></i>Mon – Sat: 08:00 – 18:00</p>
+            <p class="text-emerald-400"><i class="fa-solid fa-shield-halved mr-1.5"></i>Temperature-controlled handling</p>
+            <div class="pt-2 border-t border-white/5">
+              <span class="text-[9px] uppercase tracking-wider text-white/50 block">Payment Options</span>
+              <span class="text-[#c9a03d] text-[10px] font-medium">EFT • Mobile Money • Card • Cash on Delivery</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Contact -->
+        <div>
+          <h5 class="text-white font-serif font-bold text-sm mb-3">Direct Inquiries</h5>
+          <div class="space-y-2">
+            <a href="mailto:winecoeswatini@yahoo.com" class="flex items-center gap-2 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/90 transition-colors truncate">
+              <i class="fa-solid fa-envelope text-[#c9a03d]"></i>
+              <span class="truncate text-[11px]">winecoeswatini@yahoo.com</span>
+            </a>
+            <a href="tel:+26878381971" class="flex items-center gap-2 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/90 transition-colors">
+              <i class="fa-solid fa-phone text-[#c9a03d]"></i>
+              <span class="text-[11px]">+268 7838 1971 / 7686 9104</span>
+            </a>
+            <div class="bg-[#722f37]/25 p-2.5 rounded-xl border border-[#722f37]/50 text-[10px] text-[#c4bbb2] mt-2">
+              <span class="text-[#c9a03d] font-bold block mb-0.5">🔞 18+ Mandatory Verification</span>
+              <span>Alcohol is not sold to minors. Please enjoy responsibly.</span>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div>
-        <h5 class="text-white font-bold mb-2">Quick Navigation</h5>
-        <ul class="space-y-1.5 text-neutral-400">
-          <li><a href="javascript:void(0)" onclick="switchPage('shop')" class="hover:text-[#c9a03d]">Wine Cellar</a></li>
-          <li><a href="javascript:void(0)" onclick="switchPage('subscription')" class="hover:text-[#c9a03d]">Wine Club Boxes</a></li>
-          <li><a href="javascript:void(0)" onclick="switchPage('pairings')" class="hover:text-[#c9a03d]">Food Pairings</a></li>
-        </ul>
+
+      <!-- Bottom Bar -->
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-neutral-500">
+        <p>© 2026 Wine & Co. Eswatini. All rights reserved. Prices in <strong class="text-[#c9a03d]">Swaziland Lilangeni (E/SZL)</strong>.</p>
+        <div class="flex items-center gap-3">
+          <button onclick="switchPage('about')" class="hover:text-white transition-colors">About Us</button>
+          <span>•</span>
+          <button onclick="handlePortalClick()" class="hover:text-[#c9a03d] transition-colors">Staff Portal</button>
+          <span>•</span>
+          <button onclick="switchPage('contact')" class="hover:text-white transition-colors">Support</button>
+          
+        </div>
       </div>
-      <div>
-        <h5 class="text-white font-bold mb-2">Gifting & Magazine</h5>
-        <ul class="space-y-1.5 text-neutral-400">
-          <li><a href="javascript:void(0)" onclick="switchPage('corporate')" class="hover:text-[#c9a03d]">Corporate Gifts</a></li>
-          <li><a href="javascript:void(0)" onclick="switchPage('baskets')" class="hover:text-[#c9a03d]">Gift Hampers</a></li>
-          <li><a href="javascript:void(0)" onclick="switchPage('magazine')" class="hover:text-[#c9a03d]">Boutique Magazine (E45)</a></li>
-        </ul>
-      </div>
-      <div>
-        <h5 class="text-white font-bold mb-2">Concierge Support</h5>
-        <p class="text-neutral-400">📞 +268 7838 1971</p>
-        <p class="text-neutral-400">📧 siphiwosethuthikazi@gmail.com</p>
-        <p class="text-[#c9a03d] font-bold mt-2">🔞 18+ Mandatory Verification • Sip Responsibly</p>
-      </div>
-    </div>
-    <div class="max-w-7xl mx-auto px-4 text-center pt-4 text-neutral-500">
-      © 2026 Wine & Co. Eswatini. All rights reserved. Prices in Swaziland Lilangeni (E/SZL).
     </div>
   </footer>
 
   <!-- ==================== DATA & INTERACTIVITY JAVASCRIPT ==================== -->
   <script>
     const WINES = [
-      { id: 1, name: 'Château Margaux', variety: 'Cabernet Sauvignon', origin: 'Bordeaux, France', vintage: 2018, price: 571, image: './htdocs/uploads/wines/margaux.png', fallback: './wineco/public/wines/margaux.png' },
-      { id: 2, name: 'Cloudy Bay', variety: 'Sauvignon Blanc', origin: 'Marlborough, New Zealand', vintage: 2021, price: 615, image: './htdocs/uploads/wines/cloudybay.png', fallback: './wineco/public/wines/cloudybay.png' },
-      { id: 3, name: 'Kanonkop Pinotage', variety: 'Pinotage', origin: 'Stellenbosch, South Africa', vintage: 2020, price: 345, image: './htdocs/uploads/wines/kanonkop.png', fallback: './wineco/public/wines/kanonkop.png' },
-      { id: 4, name: 'Opus One', variety: 'Cabernet Sauvignon', origin: 'Napa Valley, USA', vintage: 2018, price: 745, image: './htdocs/uploads/wines/opusone.png', fallback: './wineco/public/wines/opusone.png' },
-      { id: 5, name: 'Kanonkop Kadette', variety: 'Cape Blend', origin: 'Stellenbosch, South Africa', vintage: 2021, price: 499, image: './htdocs/uploads/wines/kanonkop-kadette.png', fallback: './wineco/public/wines/kanonkop-kadette.png' },
-      { id: 6, name: 'Meerlust Rubicon', variety: 'Bordeaux Blend', origin: 'Stellenbosch, South Africa', vintage: 2018, price: 273, image: './htdocs/uploads/wines/meerlust.png', fallback: './wineco/public/wines/meerlust.png' },
-      { id: 7, name: 'La Torre', variety: "Montepulciano d'Abruzzo", origin: 'Italy', vintage: 2020, price: 980, image: './htdocs/uploads/wines/la-torre.png', fallback: './wineco/public/wines/la-torre.png' },
-      { id: 8, name: 'The Reserve', variety: 'Red Blend', origin: 'South Africa', vintage: 2021, price: 700, image: './htdocs/uploads/wines/the-reserve-red-blend.png', fallback: './wineco/public/wines/the-reserve-red-blend.png' },
-      { id: 9, name: 'Franschhoek Cellar', variety: 'Sauvignon Blanc', origin: 'South Africa', vintage: 2021, price: 179, image: './htdocs/uploads/wines/franschhoek-cellar-sauvignon-blanc.png', fallback: './wineco/public/wines/franschhoek-cellar-sauvignon-blanc.png' },
-      { id: 10, name: 'Billingham Big Oak', variety: 'Red Blend', origin: 'Mozambique', vintage: 2018, price: 527, image: './htdocs/uploads/wines/billingham-big-oak-red.png', fallback: './wineco/public/wines/billingham-big-oak-red.png' },
-      { id: 11, name: 'Grand Vin de Bordeaux', variety: 'Red Blend', origin: 'France', vintage: 2019, price: 416, image: './htdocs/uploads/wines/grand-vin-bordeaux-medoc.png', fallback: './wineco/public/wines/grand-vin-bordeaux-medoc.png' },
-      { id: 12, name: 'Paco Milan', variety: 'Tempranillo Blend', origin: 'Spain', vintage: 2017, price: 319, image: './htdocs/uploads/wines/paco-milan.png', fallback: './wineco/public/wines/paco-milan.png' }
+      { id: 1, name: 'Château Margaux', variety: 'Cabernet Sauvignon', origin: 'Bordeaux, France', vintage: 2018, price: 571, stock: 24, image: './htdocs/uploads/wines/margaux.png', fallback: './wineco/public/wines/margaux.png' },
+      { id: 2, name: 'Cloudy Bay', variety: 'Sauvignon Blanc', origin: 'Marlborough, New Zealand', vintage: 2021, price: 615, stock: 21, image: './htdocs/uploads/wines/cloudybay.png', fallback: './wineco/public/wines/cloudybay.png' },
+      { id: 3, name: 'Kanonkop Pinotage', variety: 'Pinotage', origin: 'Stellenbosch, South Africa', vintage: 2020, price: 345, stock: 16, image: './htdocs/uploads/wines/kanonkop.png', fallback: './wineco/public/wines/kanonkop.png' },
+      { id: 4, name: 'Opus One', variety: 'Cabernet Sauvignon', origin: 'Napa Valley, USA', vintage: 2018, price: 745, stock: 14, image: './htdocs/uploads/wines/opusone.png', fallback: './wineco/public/wines/opusone.png' },
+      { id: 5, name: 'Kanonkop Kadette', variety: 'Cape Blend', origin: 'Stellenbosch, South Africa', vintage: 2021, price: 499, stock: 18, image: './htdocs/uploads/wines/kanonkop-kadette.png', fallback: './wineco/public/wines/kanonkop-kadette.png' },
+      { id: 6, name: 'Meerlust Rubicon', variety: 'Bordeaux Blend', origin: 'Stellenbosch, South Africa', vintage: 2018, price: 273, stock: 15, image: './htdocs/uploads/wines/meerlust.png', fallback: './wineco/public/wines/meerlust.png' },
+      { id: 7, name: 'La Torre', variety: "Montepulciano d'Abruzzo", origin: 'Italy', vintage: 2020, price: 980, stock: 8, image: './htdocs/uploads/wines/la-torre.png', fallback: './wineco/public/wines/la-torre.png' },
+      { id: 8, name: 'The Reserve', variety: 'Red Blend', origin: 'South Africa', vintage: 2021, price: 700, stock: 12, image: './htdocs/uploads/wines/the-reserve-red-blend.png', fallback: './wineco/public/wines/the-reserve-red-blend.png' },
+      { id: 9, name: 'Franschhoek Cellar', variety: 'Sauvignon Blanc', origin: 'South Africa', vintage: 2021, price: 179, stock: 20, image: './htdocs/uploads/wines/franschhoek-cellar-sauvignon-blanc.png', fallback: './wineco/public/wines/franschhoek-cellar-sauvignon-blanc.png' },
+      { id: 10, name: 'Billingham Big Oak', variety: 'Red Blend', origin: 'Mozambique', vintage: 2018, price: 527, stock: 11, image: './htdocs/uploads/wines/billingham-big-oak-red.png', fallback: './wineco/public/wines/billingham-big-oak-red.png' },
+      { id: 11, name: 'Grand Vin de Bordeaux', variety: 'Red Blend', origin: 'France', vintage: 2019, price: 416, stock: 14, image: './htdocs/uploads/wines/grand-vin-bordeaux-medoc.png', fallback: './wineco/public/wines/grand-vin-bordeaux-medoc.png' },
+      { id: 12, name: 'Paco Milan', variety: 'Tempranillo Blend', origin: 'Spain', vintage: 2017, price: 319, stock: 13, image: './htdocs/uploads/wines/paco-milan.png', fallback: './wineco/public/wines/paco-milan.png' }
     ];
 
     const HERO_SLIDES = [
@@ -1704,6 +2064,10 @@
         activeNav.classList.add('bg-[#722f37]', 'text-white');
       }
 
+      if (pageId === 'admin') {
+        renderAdminAll();
+      }
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -2052,27 +2416,588 @@
       `).join('');
     }
 
+    /* ==================== ADMIN PORTAL LIVE STATE & MANAGEMENT ==================== */
+    let ADMIN_SUBSCRIBERS = JSON.parse(localStorage.getItem('wineco_admin_subscribers')) || [
+      { id: 'sub_1', name: 'Siphiwo Sethu Thikazi', email: 'siphiwosethuthikazi@gmail.com', tier: 'Luxury Reserve Box', price: 1999, status: 'active' },
+      { id: 'sub_2', name: 'Phumelele Dlamini', email: 'phumza19952010@gmail.com', tier: 'Vineyard Voyager Box', price: 999, status: 'active' },
+      { id: 'sub_3', name: 'Lihle Mfundo Mbhamali', email: 'mfundombhamaly@gmail.com', tier: 'Essential Elegance Box', price: 499, status: 'active' },
+      { id: 'sub_4', name: 'Mandla Dube', email: 'mandla.dube@swazi.net', tier: 'Grand Reserve Society', price: 4999, status: 'active' },
+      { id: 'sub_5', name: 'Nokwanda Simelane', email: 'nokwanda.s@outlook.com', tier: 'Vineyard Voyager Box', price: 999, status: 'cancelled' }
+    ];
+
+    let ADMIN_EMAIL_LOGS = JSON.parse(localStorage.getItem('wineco_admin_email_logs')) || [
+      { email: 'admin@wineco.sz', role: 'Super Admin', time: '2026-09-03 08:45', location: 'Mbabane, Eswatini', status: 'Success' },
+      { email: 'winecoeswatini@yahoo.com', role: 'Concierge Desk', time: '2026-09-03 08:30', location: 'Mbabane, Eswatini', status: 'Success' },
+      { email: 'phumza19952010@gmail.com', role: 'VIP Member', time: '2026-09-02 19:15', location: 'Ezulwini, Eswatini', status: 'Success' },
+      { email: 'staff@wineco.sz', role: 'Sommelier Station', time: '2026-09-02 16:40', location: 'Manzini, Eswatini', status: 'Success' },
+      { email: 'mfundombhamaly@gmail.com', role: 'VIP Member', time: '2026-09-02 11:22', location: 'Manzini, Eswatini', status: 'Success' }
+    ];
+
+    /* ==================== CUSTOMER ORDERS REPOSITORY ==================== */
+    let currentAdminOrderFilter = 'pending';
+    let ADMIN_ORDERS = JSON.parse(localStorage.getItem('wineco_admin_orders')) || [
+      {
+        id: 'ord_1',
+        orderRef: 'ORD-20260903-8412',
+        customerName: 'Phumelele Dlamini',
+        phone: '+268 7686 9104',
+        address: 'Plot 44, Ezulwini Valley',
+        total: 1145.40,
+        paymentMethod: 'cash',
+        date: '2026-09-03',
+        status: 'pending',
+        token: 'WN-8412',
+        itemsSummary: 'Kanonkop Pinotage (×2), Cloudy Bay (×1)'
+      },
+      {
+        id: 'ord_2',
+        orderRef: 'ORD-20260902-3195',
+        customerName: 'Siphiwo Sethu Thikazi',
+        phone: '+268 7838 1971',
+        address: 'Highland View Estate, Mbabane',
+        total: 780.00,
+        paymentMethod: 'cash',
+        date: '2026-09-02',
+        status: 'pending',
+        token: 'WN-3195',
+        itemsSummary: 'Meerlust Rubicon (×1), The Reserve Red (×1)'
+      },
+      {
+        id: 'ord_3',
+        orderRef: 'ORD-20260901-7721',
+        customerName: 'Lihle Mfundo Mbhamali',
+        phone: '+268 7612 3456',
+        address: 'Fairview North, Manzini',
+        total: 446.75,
+        paymentMethod: 'bank',
+        date: '2026-09-01',
+        status: 'done',
+        token: 'WN-7721',
+        itemsSummary: 'Château Margaux (×1)'
+      },
+      {
+        id: 'ord_4',
+        orderRef: 'ORD-20260829-6014',
+        customerName: 'Mandla Dube',
+        phone: '+268 7602 1199',
+        address: 'Coopers & Lybrand House, Mbabane',
+        total: 2987.70,
+        paymentMethod: 'bank',
+        date: '2026-08-29',
+        status: 'done',
+        token: 'WN-6014',
+        itemsSummary: 'Grand Vin Bordeaux (×3), Opus One (×1)'
+      },
+      {
+        id: 'ord_5',
+        orderRef: 'ORD-20260825-4109',
+        customerName: 'Nokwanda Simelane',
+        phone: '+268 7945 8821',
+        address: 'Matsapha Industrial Site',
+        total: 1230.00,
+        paymentMethod: 'stripe',
+        date: '2026-08-25',
+        status: 'done',
+        token: 'WN-4109',
+        itemsSummary: 'Franschhoek Cellar (×4)'
+      }
+    ];
+
+    function generateDeliveryToken(orderRef) {
+      const parts = orderRef.split('-');
+      const last = parts[parts.length - 1] || Math.floor(1000 + Math.random() * 9000).toString();
+      return 'WN-' + last.slice(-4);
+    }
+
+    function calculateAdminStats() {
+      const totalBottles = WINES.reduce((sum, w) => sum + (Number(w.stock) || 0), 0);
+      const totalValuation = WINES.reduce((sum, w) => sum + ((Number(w.stock) || 0) * w.price), 0);
+      const activeSubs = ADMIN_SUBSCRIBERS.filter(s => s.status === 'active');
+      const mrr = activeSubs.reduce((sum, s) => sum + Number(s.price), 0);
+      
+      // Actual gross sales from recorded customer orders + monthly club dues
+      const actualOrdersSales = ADMIN_ORDERS.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+      const combinedGrossRevenue = actualOrdersSales + mrr;
+
+      const grossEl = document.getElementById('adminGrossRevEl');
+      const stockEl = document.getElementById('adminTotalStockEl');
+      const valuationEl = document.getElementById('adminStockValuation');
+      const activeSubsEl = document.getElementById('adminActiveSubsEl');
+      const subsMrrEl = document.getElementById('adminSubsMrr');
+      const activeBadgeEl = document.getElementById('adminActiveBadge');
+      const capturedEmailsEl = document.getElementById('adminCapturedEmailsEl');
+
+      if (grossEl) grossEl.innerText = `E${combinedGrossRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (stockEl) stockEl.innerText = `${totalBottles} Bottles`;
+      if (valuationEl) valuationEl.innerText = `Cellar Valuation: E${totalValuation.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (activeSubsEl) activeSubsEl.innerText = `${activeSubs.length} Members`;
+      if (subsMrrEl) subsMrrEl.innerText = `E${mrr.toLocaleString('en-US', { minimumFractionDigits: 2 })} / month MRR`;
+      if (activeBadgeEl) activeBadgeEl.innerText = `${activeSubs.length} Active Subscriptions`;
+      if (capturedEmailsEl) capturedEmailsEl.innerText = `${ADMIN_EMAIL_LOGS.length} Logged`;
+    }
+
     function renderAdminTable() {
-      document.getElementById('adminWineTable').innerHTML = WINES.map(w => `
-        <tr class="hover:bg-[#faf6f0]">
-          <td class="p-3 font-bold text-[#722f37]">${w.name}</td>
-          <td class="p-3">${w.variety}</td>
+      const table = document.getElementById('adminWineTable');
+      if (!table) return;
+
+      table.innerHTML = WINES.map(w => `
+        <tr class="hover:bg-[#faf6f0] transition-colors">
+          <td class="p-3 flex items-center gap-2.5">
+            <img src="${w.image}" alt="${w.name}" class="w-7 h-10 object-contain rounded" onerror="this.onerror=null;this.src='${w.fallback}'">
+            <div>
+              <strong class="font-bold text-[#722f37] block">${w.name}</strong>
+              <span class="text-[10px] text-neutral-400">Vintage: ${w.vintage || 2021}</span>
+            </div>
+          </td>
+          <td class="p-3 text-neutral-600 font-medium">${w.variety}</td>
           <td class="p-3 text-neutral-500">${w.origin}</td>
           <td class="p-3 font-bold text-[#1a6b3c]">E${w.price.toFixed(2)}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">12 In Stock</span></td>
+          <td class="p-3">
+            <span class="px-2.5 py-1 rounded-full font-bold text-[10px] uppercase ${
+              (w.stock || 0) === 0 ? 'bg-red-100 text-red-800' :
+              (w.stock || 0) <= 10 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+            }">
+              ${w.stock || 0} bottles ${(w.stock || 0) <= 10 ? '(Low)' : ''}
+            </span>
+          </td>
+          <td class="p-3">
+            <div class="flex items-center gap-1.5">
+              <button onclick="adjustWineStock(${w.id}, -1)" class="w-6 h-6 rounded-lg bg-white border border-[#d8d0c8] hover:bg-red-50 hover:text-red-600 font-bold flex items-center justify-center text-xs transition-colors" title="Remove 1 bottle">-</button>
+              <span class="w-7 text-center font-bold text-[#2c1a1a]">${w.stock || 0}</span>
+              <button onclick="adjustWineStock(${w.id}, 1)" class="w-6 h-6 rounded-lg bg-white border border-[#d8d0c8] hover:bg-emerald-50 hover:text-emerald-600 font-bold flex items-center justify-center text-xs transition-colors" title="Add 1 bottle">+</button>
+              <button onclick="adjustWineStock(${w.id}, 6)" class="px-2 py-0.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-[10px] font-semibold text-neutral-600 ml-1" title="Add 1 case">+6 (Case)</button>
+            </div>
+          </td>
         </tr>
       `).join('');
     }
 
+    function renderAdminSubscriptions() {
+      const table = document.getElementById('adminSubsTable');
+      if (!table) return;
+
+      table.innerHTML = ADMIN_SUBSCRIBERS.map(sub => `
+        <tr class="hover:bg-[#faf6f0] transition-colors">
+          <td class="p-3">
+            <strong class="text-[#2c1a1a] block font-bold">${sub.name}</strong>
+          </td>
+          <td class="p-3 font-mono text-[#722f37] text-xs">${sub.email}</td>
+          <td class="p-3 font-semibold text-[#722f37]">${sub.tier}</td>
+          <td class="p-3 font-bold text-[#1a6b3c]">E${Number(sub.price).toFixed(2)}/mo</td>
+          <td class="p-3">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
+              sub.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+            }">
+              ${sub.status}
+            </span>
+          </td>
+          <td class="p-3 text-right">
+            ${sub.status === 'active' ? `
+              <button onclick="toggleSubStatus('${sub.id}')" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-1 rounded-xl font-bold text-xs transition-colors inline-flex items-center gap-1">
+                <i class="fa-solid fa-ban text-[10px]"></i>
+                <span>Cancel</span>
+              </button>
+            ` : `
+              <button onclick="toggleSubStatus('${sub.id}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-xl font-bold text-xs transition-colors inline-flex items-center gap-1">
+                <i class="fa-solid fa-check text-[10px]"></i>
+                <span>Activate</span>
+              </button>
+            `}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAdminEmails() {
+      const table = document.getElementById('adminEmailsTable');
+      if (!table) return;
+
+      table.innerHTML = ADMIN_EMAIL_LOGS.map(log => `
+        <tr class="hover:bg-[#faf6f0] transition-colors">
+          <td class="p-3 font-mono font-bold text-[#722f37] text-xs flex items-center gap-1.5">
+            <i class="fa-solid fa-envelope text-neutral-400"></i>
+            <span>${log.email}</span>
+          </td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#722f37]/10 text-[#722f37] uppercase">
+              ${log.role}
+            </span>
+          </td>
+          <td class="p-3 text-neutral-500 text-[11px]"><i class="fa-regular fa-clock text-[#c9a03d] mr-1"></i>${log.time}</td>
+          <td class="p-3 text-neutral-600 text-xs">${log.location}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 uppercase flex items-center gap-1 w-max">
+              <i class="fa-solid fa-circle-check text-[9px]"></i> Authorized
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAdminOrders() {
+      const table = document.getElementById('adminOrdersTable');
+      if (!table) return;
+
+      const pendingOrders = ADMIN_ORDERS.filter(o => o.status === 'pending');
+      const doneOrders = ADMIN_ORDERS.filter(o => o.status === 'done');
+
+      // Update count badges
+      const pendingBadge = document.getElementById('adminPendingCountBadge');
+      const doneBadge = document.getElementById('adminDoneCountBadge');
+      if (pendingBadge) pendingBadge.textContent = pendingOrders.length;
+      if (doneBadge) doneBadge.textContent = doneOrders.length;
+
+      // Update button visual styles
+      const btnPending = document.getElementById('adminTabPendingOrders');
+      const btnDone = document.getElementById('adminTabDoneOrders');
+      if (btnPending && btnDone) {
+        if (currentAdminOrderFilter === 'pending') {
+          btnPending.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-amber-500 text-white shadow-sm';
+          btnDone.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-neutral-600 hover:text-[#722f37]';
+        } else {
+          btnDone.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-emerald-600 text-white shadow-sm';
+          btnPending.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-neutral-600 hover:text-[#722f37]';
+        }
+      }
+
+      const displayed = currentAdminOrderFilter === 'pending' ? pendingOrders : doneOrders;
+
+      if (displayed.length === 0) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="9" class="p-8 text-center text-neutral-400">
+              <i class="fa-solid fa-boxes-stacked text-3xl opacity-30 mb-2 block"></i>
+              <span>${currentAdminOrderFilter === 'pending' ? 'No pending orders — everything has been dispatched!' : 'No completed orders yet.'}</span>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      table.innerHTML = displayed.map(o => `
+        <tr class="hover:bg-[#faf6f0] transition-colors ${o.status === 'pending' ? 'bg-amber-50/20' : ''}">
+          <td class="p-3 font-mono font-bold text-[#722f37] text-xs">
+            <span>${o.orderRef}</span>
+            <span class="text-[10px] text-neutral-400 block font-normal truncate max-w-[130px]">${o.itemsSummary || 'Curated Wines'}</span>
+          </td>
+          <td class="p-3">
+            <strong class="text-[#2c1a1a] block font-bold">${o.customerName}</strong>
+            <span class="text-neutral-500 text-[11px] block truncate max-w-[150px]"><i class="fa-solid fa-location-dot text-[#c9a03d] mr-1"></i>${o.address || 'Eswatini'}</span>
+          </td>
+          <td class="p-3">
+            ${o.phone ? `
+              <a href="tel:${o.phone}" class="flex items-center gap-1.5 text-[#722f37] font-semibold hover:underline text-xs whitespace-nowrap">
+                <i class="fa-solid fa-phone text-[#c9a03d] text-[10px]"></i>
+                <span>${o.phone}</span>
+              </a>
+            ` : '<span class="text-neutral-400">—</span>'}
+          </td>
+          <td class="p-3 text-neutral-500 text-[11px]">${o.date}</td>
+          <td class="p-3 font-bold text-[#1a6b3c] text-xs">E${Number(o.total).toFixed(2)}</td>
+          <td class="p-3 text-[10px] font-bold uppercase text-neutral-600">${o.paymentMethod || 'cash'}</td>
+          <td class="p-3">
+            <span class="font-mono font-bold text-[#722f37] bg-[#722f37]/10 px-2 py-0.5 rounded-lg text-[11px] flex items-center gap-1 w-max">
+              <i class="fa-solid fa-shield-halved text-[#c9a03d] text-[9px]"></i>
+              <span>${o.token || 'WN-0000'}</span>
+            </span>
+          </td>
+          <td class="p-3">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
+              o.status === 'done' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+            }">
+              ${o.status === 'done' ? 'Completed' : 'Pending'}
+            </span>
+          </td>
+          <td class="p-3 text-right">
+            ${o.status === 'pending' ? `
+              <button onclick="markAdminOrderDone('${o.id}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-xl font-bold text-xs transition-colors inline-flex items-center gap-1 shadow-xs" title="Mark order as delivered and done">
+                <i class="fa-solid fa-circle-check text-[11px]"></i>
+                <span>Mark as Done</span>
+              </button>
+            ` : `
+              <span class="text-emerald-700 font-semibold text-[11px] flex items-center justify-end gap-1">
+                <i class="fa-solid fa-check-double text-xs"></i> Done
+              </span>
+            `}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function setAdminOrderFilter(filter) {
+      currentAdminOrderFilter = filter;
+      renderAdminOrders();
+    }
+
+    function markAdminOrderDone(orderId) {
+      const order = ADMIN_ORDERS.find(o => o.id === orderId);
+      if (order) {
+        order.status = 'done';
+        localStorage.setItem('wineco_admin_orders', JSON.stringify(ADMIN_ORDERS));
+        renderAdminOrders();
+        showToast(`✅ Order ${order.orderRef} marked as delivered & completed!`);
+      }
+    }
+
+    function renderAdminAll() {
+      calculateAdminStats();
+      renderAdminTable();
+      renderAdminSubscriptions();
+      renderAdminEmails();
+      renderAdminOrders();
+    }
+
+    function adjustWineStock(wineId, delta) {
+      const wine = WINES.find(w => w.id === wineId);
+      if (wine) {
+        wine.stock = Math.max(0, (wine.stock || 0) + delta);
+        renderAdminAll();
+        showToast(`Stock updated: ${wine.name} now at ${wine.stock} bottles.`);
+      }
+    }
+
+    function toggleInsertStockForm() {
+      const form = document.getElementById('insertStockForm');
+      if (form) form.classList.toggle('hidden');
+    }
+
+    function submitNewWineStock() {
+      const name = document.getElementById('newWineName')?.value;
+      const variety = document.getElementById('newWineVariety')?.value || 'Red Blend';
+      const origin = document.getElementById('newWineOrigin')?.value || 'South Africa';
+      const price = parseFloat(document.getElementById('newWinePrice')?.value) || 350;
+      const stock = parseInt(document.getElementById('newWineStock')?.value) || 12;
+      const vintage = parseInt(document.getElementById('newWineVintage')?.value) || 2021;
+
+      if (!name) {
+        alert('Please enter a wine name.');
+        return;
+      }
+
+      const newId = WINES.length + 1;
+      const newWineItem = {
+        id: newId,
+        name: name,
+        variety: variety,
+        origin: origin,
+        vintage: vintage,
+        price: price,
+        stock: stock,
+        image: './htdocs/uploads/wines/kanonkop.png',
+        fallback: './wineco/public/wines/kanonkop.png'
+      };
+
+      WINES.unshift(newWineItem);
+      toggleInsertStockForm();
+      renderAdminAll();
+      renderShop();
+      showToast(`🍷 Added "${name}" (${stock} bottles) into Cellar Inventory!`);
+    }
+
+    function toggleSubStatus(subId) {
+      const sub = ADMIN_SUBSCRIBERS.find(s => s.id == subId);
+      if (sub) {
+        sub.status = sub.status === 'active' ? 'cancelled' : 'active';
+        localStorage.setItem('wineco_admin_subscribers', JSON.stringify(ADMIN_SUBSCRIBERS));
+        renderAdminAll();
+        showToast(`Subscription status for ${sub.name} updated to "${sub.status.toUpperCase()}".`);
+      }
+    }
+
+    function recordEmailCapture(email, role, location = 'Eswatini') {
+      if (!email) return;
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      
+      const newLog = {
+        email: email.toLowerCase().trim(),
+        role: role,
+        time: timeStr,
+        location: location,
+        status: 'Success'
+      };
+
+      // Check if already in list recently, if not add to top
+      ADMIN_EMAIL_LOGS = [newLog, ...ADMIN_EMAIL_LOGS.filter(l => l.email !== newLog.email || l.role !== newLog.role)].slice(0, 50);
+      localStorage.setItem('wineco_admin_email_logs', JSON.stringify(ADMIN_EMAIL_LOGS));
+      calculateAdminStats();
+      renderAdminEmails();
+
+      // Attempt live POST to Next.js API if server is up
+      try {
+        fetch('/api/portal-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: newLog.email, role: role, ip: location })
+        }).catch(() => {});
+      } catch (e) {}
+    }
+
+    let lastPlacedOrderData = null;
+
+    function handlePaymentMethodChange(method) {
+      const isCash = method === 'cash';
+      const codBox = document.getElementById('codNoticeBox');
+      const codTag = document.getElementById('codPhoneLabelTag');
+      const codHelp = document.getElementById('codPhoneHelpText');
+      const phoneInput = document.getElementById('chkPhone');
+
+      const labelCash = document.getElementById('labelPayCash');
+      const labelBank = document.getElementById('labelPayBank');
+      const labelStripe = document.getElementById('labelPayStripe');
+
+      if (labelCash) labelCash.className = isCash ? 'block p-4 rounded-xl border-2 border-[#722f37] bg-[#faf6f0] cursor-pointer transition-all' : 'block p-4 rounded-xl border border-[#e8e0d8] bg-white cursor-pointer hover:border-[#c9a03d] transition-all';
+      if (labelBank) labelBank.className = method === 'bank' ? 'block p-4 rounded-xl border-2 border-[#722f37] bg-[#faf6f0] cursor-pointer transition-all' : 'block p-4 rounded-xl border border-[#e8e0d8] bg-white cursor-pointer hover:border-[#c9a03d] transition-all';
+      if (labelStripe) labelStripe.className = method === 'stripe' ? 'block p-4 rounded-xl border-2 border-[#722f37] bg-[#faf6f0] cursor-pointer transition-all' : 'block p-4 rounded-xl border border-[#e8e0d8] bg-white cursor-pointer hover:border-[#c9a03d] transition-all';
+
+      if (codBox) codBox.style.display = isCash ? 'block' : 'none';
+      if (codTag) codTag.style.display = isCash ? 'inline' : 'none';
+      if (codHelp) codHelp.style.display = isCash ? 'flex' : 'none';
+      if (phoneInput) {
+        if (isCash) {
+          phoneInput.classList.add('border-[#722f37]', 'bg-amber-50/30');
+          phoneInput.placeholder = 'e.g. +268 7838 1971 (Courier will call for directions)';
+        } else {
+          phoneInput.classList.remove('border-[#722f37]', 'bg-amber-50/30');
+          phoneInput.placeholder = '+268 7838 1971';
+        }
+      }
+    }
+
     function placeOrder() {
-      const name = document.getElementById('chkName')?.value;
-      if (!name) { alert('Please enter your full name'); return; }
-      const orderRef = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-      alert(`🎉 Thank you, ${name}! Your Wine & Co. order (${orderRef}) has been received and confirmed!`);
+      const name = (document.getElementById('chkName')?.value || '').trim();
+      const email = (document.getElementById('chkEmail')?.value || '').trim();
+      const phone = (document.getElementById('chkPhone')?.value || '').trim();
+      const address = (document.getElementById('chkAddress')?.value || '').trim();
+      const payRadio = document.querySelector('input[name="chkPayMethod"]:checked');
+      const payMethod = payRadio ? payRadio.value : 'cash';
+
+      if (!name) {
+        alert('Please enter your full name for delivery.');
+        document.getElementById('chkName')?.focus();
+        return;
+      }
+
+      // Cash on Delivery requires phone number for delivery driver directions
+      if (payMethod === 'cash' && !phone) {
+        alert('📞 Phone Number is required for Cash on Delivery so our courier can contact you for delivery directions.');
+        document.getElementById('chkPhone')?.focus();
+        return;
+      }
+
+      if (!address) {
+        alert('Please provide your street address or drop-off location in Eswatini.');
+        document.getElementById('chkAddress')?.focus();
+        return;
+      }
+
+      if (cart.length === 0) {
+        alert('Your shopping bag is empty! Please add wines before checking out.');
+        return;
+      }
+
+      const orderNumber = 'ORD-' + new Date().getFullYear() + String(new Date().getMonth()+1).padStart(2,'0') + String(new Date().getDate()).padStart(2,'0') + '-' + Math.floor(1000 + Math.random() * 9000);
+      const securityToken = generateDeliveryToken(orderNumber);
+
+      const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      const deliveryFee = subtotal >= 600 ? 0 : 50;
+      const grandTotal = subtotal + deliveryFee;
+      const itemsSummary = cart.map(i => `${i.name} (×${i.qty})`).join(', ');
+
+      const newOrder = {
+        id: 'ord_' + Date.now(),
+        orderRef: orderNumber,
+        customerName: name,
+        email: email,
+        phone: phone,
+        address: address,
+        total: grandTotal,
+        paymentMethod: payMethod,
+        date: new Date().toISOString().split('T')[0],
+        status: 'pending',
+        token: securityToken,
+        itemsSummary: itemsSummary
+      };
+
+      // Record into admin repository
+      ADMIN_ORDERS.unshift(newOrder);
+      localStorage.setItem('wineco_admin_orders', JSON.stringify(ADMIN_ORDERS));
+
+      // Save order context for confirmation display & WhatsApp
+      lastPlacedOrderData = newOrder;
+
+      // Update Order Confirmation View
+      const refEl = document.getElementById('confirmOrderRef');
+      const tokenEl = document.getElementById('confirmSecurityToken');
+      const nameEl = document.getElementById('confirmCustomerName');
+      const phoneEl = document.getElementById('confirmCustomerPhone');
+      const totalEl = document.getElementById('confirmOrderTotal');
+      const methodEl = document.getElementById('confirmPayMethod');
+
+      if (refEl) refEl.textContent = orderNumber;
+      if (tokenEl) tokenEl.textContent = securityToken;
+      if (nameEl) nameEl.textContent = name;
+      if (phoneEl) phoneEl.textContent = phone || 'Not provided';
+      if (totalEl) totalEl.textContent = `E${grandTotal.toFixed(2)}`;
+      if (methodEl) {
+        methodEl.textContent = payMethod === 'cash' ? '💵 Cash on Delivery' : (payMethod === 'bank' ? '🏦 Direct Bank Transfer' : '💳 Credit Card');
+      }
+
+      // Generate QR Code on canvas/container
+      const qrContainer = document.getElementById('confirmQrCodeCanvas');
+      if (qrContainer) {
+        qrContainer.innerHTML = '';
+        const qrPayload = `WINECO|REF:${orderNumber}|TOKEN:${securityToken}|NAME:${name}|TOTAL:E${grandTotal.toFixed(2)}`;
+        try {
+          if (typeof QRCode !== 'undefined') {
+            new QRCode(qrContainer, {
+              text: qrPayload,
+              width: 140,
+              height: 140,
+              colorDark: '#1a0f0f',
+              colorLight: '#ffffff',
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          } else {
+            qrContainer.innerHTML = `<div class="p-4 border-2 border-dashed border-[#722f37] text-center font-mono text-[10px] text-[#722f37] font-bold">QR CODE<br>${securityToken}</div>`;
+          }
+        } catch (e) {
+          qrContainer.innerHTML = `<div class="p-4 border-2 border-dashed border-[#722f37] text-center font-mono text-[10px] text-[#722f37] font-bold">PASS TOKEN<br>${securityToken}</div>`;
+        }
+      }
+
+      // Empty shopping bag
       cart = [];
       localStorage.removeItem('wineco_static_cart');
       updateCartUI();
-      switchPage('home');
+
+      // Automatically trigger WhatsApp confirmation link if phone provided
+      if (phone) {
+        openWhatsAppNotification(newOrder);
+      }
+
+      showToast(`🍷 Order ${orderNumber} placed! Your delivery verification token is ${securityToken}.`);
+
+      // Switch view to confirmation pass
+      switchPage('order-confirmation');
+    }
+
+    function openWhatsAppNotification(order) {
+      const o = order || lastPlacedOrderData;
+      if (!o) return;
+      const cleanPhone = (o.phone || '').replace(/[\s\-\(\)]/g, '');
+      const waMsg =
+        `🍷 *Wine %26 Co. Order Confirmed!*%0A%0A` +
+        `📦 *Order Reference:* ${o.orderRef}%0A` +
+        `🔑 *Delivery Token:* ${o.token}%0A` +
+        `👤 *Customer:* ${encodeURIComponent(o.customerName)}%0A` +
+        `📍 *Delivery Point:* ${encodeURIComponent(o.address)}%0A` +
+        `💳 *Payment:* ${o.paymentMethod.toUpperCase()}%0A%0A` +
+        `*Items Ordered:*%0A${encodeURIComponent(o.itemsSummary)}%0A%0A` +
+        `💰 *Total Amount:* E${Number(o.total).toFixed(2)}%0A%0A` +
+        `ℹ️ *Delivery Instructions:* Please present your Token (*${o.token}*) or show your QR pass to the driver upon arrival. Thank you for choosing Wine %26 Co. Eswatini! 🥂`;
+
+      window.open(`https://wa.me/${cleanPhone}?text=${waMsg}`, '_blank');
     }
 
     /* ==================== AGE GATE FLASH FIX & RE-VERIFY ==================== */
@@ -2131,16 +3056,34 @@
       }, 800);
     }
 
-    function quickLogin(role) {
-      const credEntry = Object.entries(PORTAL_CREDENTIALS).find(([, v]) => v.role === role);
-      if (!credEntry) return;
-      doPortalLogin(credEntry[1].role);
+    function prefillAndFocusLogin(role) {
+      const creds = {
+        admin:  { email: 'admin@wineco.sz',  password: 'admin123' },
+        staff:  { email: 'staff@wineco.sz',  password: 'staff123' },
+        member: { email: 'member@wineco.sz', password: 'member123' }
+      };
+      const c = creds[role];
+      if (!c) return;
+      const emailEl = document.getElementById('portalEmail');
+      const passEl  = document.getElementById('portalPassword');
+      if (emailEl) emailEl.value = c.email;
+      if (passEl)  passEl.value = c.password;
+      // Scroll to the Sign In button so user can confirm and submit
+      document.getElementById('portalLoginBtn')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      passEl?.focus();
     }
+
+    // Legacy alias kept for safety
+    function quickLogin(role) { prefillAndFocusLogin(role); }
 
     function doPortalLogin(role) {
       currentPortalRole = role;
       const cred = Object.values(PORTAL_CREDENTIALS).find(c => c.role === role);
       if (!cred) return;
+
+      // Real-time email capture for admin stream & DB logging
+      const emailUsed = (document.getElementById('portalEmail')?.value || (role === 'admin' ? 'admin@wineco.sz' : role === 'staff' ? 'staff@wineco.sz' : 'member@wineco.sz')).toLowerCase().trim();
+      recordEmailCapture(emailUsed, cred.label, 'Mbabane, Eswatini');
 
       // Update header button to show logged-in state without altering button width
       const btn  = document.getElementById('portalHeaderBtn');
@@ -2243,6 +3186,37 @@
         };
         localStorage.setItem('wineco_active_vip_member', JSON.stringify(memberUser));
 
+        // Real-time store into Admin Subscriptions & Email Stream
+        const newSubItem = {
+          id: 'sub_' + Date.now(),
+          name: name,
+          email: email.toLowerCase().trim(),
+          tier: memberUser.tier,
+          price: selectedSubTier ? selectedSubTier.price : 999,
+          status: 'active'
+        };
+        ADMIN_SUBSCRIBERS = [newSubItem, ...ADMIN_SUBSCRIBERS];
+        localStorage.setItem('wineco_admin_subscribers', JSON.stringify(ADMIN_SUBSCRIBERS));
+        recordEmailCapture(email, 'VIP Member Registered', `${address}, Eswatini`);
+
+        // Post to API asynchronously if server is running
+        try {
+          fetch('/api/subscriptions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              planName: newSubItem.tier,
+              price: newSubItem.price,
+              fullName: name,
+              email: email,
+              phone: phone,
+              address: address,
+              city: 'Eswatini',
+              paymentMethod: payMethod
+            })
+          }).catch(() => {});
+        } catch(err) {}
+
         // Update member lounge display elements
         const nameEl = document.getElementById('memberUserDisplayName');
         if (nameEl) nameEl.innerText = name.split(' ')[0] || name;
@@ -2254,7 +3228,12 @@
         document.getElementById('subSuccessTier').innerText = memberUser.tier;
         document.getElementById('subSuccessView').classList.remove('hidden');
 
-        showToast(`🎉 Welcome to VIP Membership, ${name}!`);
+        showToast(`🎉 Welcome to VIP Membership, ${name}! Check ${email} for your confirmation.`);
+
+        // Delayed second toast confirming email was dispatched
+        setTimeout(() => {
+          showToast(`📧 A welcome email has been sent to ${email}`);
+        }, 2200);
       }, 1200);
     }
 
