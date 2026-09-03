@@ -935,22 +935,77 @@
       </div>
     </div>
 
-    <!-- PAGE 10: ADMIN DASHBOARD VIEW -->
-    <div id="page-admin" class="page-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6 animate-in fade-in">
-      <div class="bg-[#1a0f0f] rounded-3xl p-6 text-white border-2 border-[#c9a03d] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <!-- PAGE 10: ADMIN DASHBOARD VIEW (COMPACT EXECUTIVE COMMAND) -->
+    <div id="page-admin" class="page-view hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-in fade-in">
+      
+      <!-- Top Banner -->
+      <div class="bg-[#1a0f0f] rounded-3xl p-6 text-white border-2 border-[#c9a03d] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg">
         <div>
           <span class="text-xs uppercase font-bold text-[#c9a03d] tracking-widest flex items-center gap-1.5">
             <i class="fa-solid fa-crown text-xs"></i> Super Administrator Portal
           </span>
           <h1 class="text-2xl md:text-3xl font-serif font-bold mt-0.5">Executive Management Control</h1>
         </div>
-        <div class="flex items-center gap-4 text-xs">
+        <div class="flex items-center gap-3 text-xs">
           <div class="text-right">
             <span class="text-[#c9a03d] font-bold block" id="adminUserDisplayName">Siphiwo Thikazi (Super Admin)</span>
-            <span class="text-white/70">admin@wineco.sz</span>
+            <span class="text-white/70">admin@wineco.sz • Eswatini</span>
           </div>
+          <button onclick="switchPage('home')" class="bg-white/10 hover:bg-[#722f37] text-white px-3 py-2 rounded-xl border border-white/20 font-bold transition-colors">
+            <i class="fa-solid fa-store mr-1"></i> Storefront
+          </button>
           <button onclick="logoutPortal()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-2 rounded-xl border border-white/20 font-bold transition-colors">
             <i class="fa-solid fa-right-from-bracket mr-1"></i> Sign Out
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Action Command Toolbar -->
+      <div class="bg-white p-3 rounded-2xl border border-[#e8e0d8] shadow-sm flex flex-wrap items-center justify-between gap-2.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider hidden md:inline-block mr-1">
+            Quick Actions:
+          </span>
+
+          <!-- 1. INVENTORY CONTROL POPUP BUTTON -->
+          <button onclick="openInventoryModal()" class="bg-[#722f37] hover:bg-[#59232a] text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 shadow-sm transition-all text-xs hover:scale-[1.02] active:scale-[0.98]">
+            <i class="fa-solid fa-wine-bottle text-[#c9a03d]"></i>
+            <span>Inventory Control</span>
+            <span id="adminBtnStockCount" class="bg-[#c9a03d] text-[#1a0f0f] text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+              186 Btls
+            </span>
+          </button>
+
+          <!-- 2. PENDING DELIVERIES BUTTON -->
+          <button onclick="focusPendingDeliveries()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 shadow-sm transition-all text-xs">
+            <i class="fa-solid fa-truck-fast"></i>
+            <span>Pending Deliveries</span>
+            <span id="adminBtnPendingBadge" class="bg-white text-amber-700 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+              2
+            </span>
+          </button>
+
+          <!-- 3. VIP CLUB MEMBERS BUTTON -->
+          <button onclick="openSubscribersModal()" class="bg-[#faf6f0] hover:bg-[#f2eae0] text-[#722f37] border border-[#e8ddd0] px-3.5 py-2 rounded-xl font-bold flex items-center gap-2 transition-colors text-xs">
+            <i class="fa-solid fa-crown text-[#c9a03d]"></i>
+            <span>VIP Wine Club</span>
+            <span id="adminBtnVipBadge" class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              4
+            </span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Quick Add Wine Button -->
+          <button onclick="openAddWineModal()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 shadow-xs transition-colors text-xs">
+            <i class="fa-solid fa-plus"></i>
+            <span>Insert Stock</span>
+          </button>
+
+          <!-- Refresh Live Data -->
+          <button onclick="renderAdminAll(); showToast('Real-time cellar records refreshed!')" class="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 px-3 py-2 rounded-xl font-semibold flex items-center gap-1.5 transition-colors text-xs">
+            <i class="fa-solid fa-rotate text-[#c9a03d]"></i>
+            <span class="hidden sm:inline">Refresh Data</span>
           </button>
         </div>
       </div>
@@ -962,179 +1017,60 @@
           <span class="text-2xl font-extrabold text-[#1a6b3c] block" id="adminGrossRevEl">E24,890.00</span>
           <span class="text-[10px] text-neutral-500 block" id="adminRevenueSubtext">Includes inventory sales & active club dues</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm space-y-1">
-          <span class="text-neutral-500 uppercase font-bold block text-[10px]">Total Stock Available</span>
-          <span class="text-2xl font-extrabold text-[#722f37] block" id="adminTotalStockEl">186 Bottles</span>
-          <span class="text-[10px] text-neutral-500 block" id="adminStockValuation">Cellar Valuation: E98,420.00</span>
+        <div onclick="focusPendingDeliveries()" class="bg-amber-50/70 p-5 rounded-2xl border-2 border-amber-300 hover:border-amber-400 cursor-pointer shadow-sm space-y-1 transition-all">
+          <span class="text-amber-900 uppercase font-bold block text-[10px]">Pending Deliveries</span>
+          <div class="flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-amber-900 block" id="adminPendingCountKpi">2 Orders</span>
+            <span class="text-[10px] font-extrabold text-[#722f37] bg-[#c9a03d]/20 px-2 py-0.5 rounded-full" id="adminVipBoxAlert">
+              👑 VIP Box Alert
+            </span>
+          </div>
+          <span class="text-[10px] text-amber-700 font-semibold block">Click to review & dispatch driver →</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm space-y-1">
+        <div onclick="openSubscribersModal()" class="bg-white p-5 rounded-2xl border border-[#e8e0d8] hover:border-[#c9a03d] cursor-pointer shadow-sm space-y-1 transition-colors">
           <span class="text-neutral-500 uppercase font-bold block text-[10px]">Active Subscriptions</span>
           <span class="text-2xl font-extrabold text-[#c9a03d] block" id="adminActiveSubsEl">4 Members</span>
           <span class="text-[10px] text-emerald-600 block font-semibold" id="adminSubsMrr">E8,496.00 / month MRR</span>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-[#e8e0d8] shadow-sm space-y-1">
-          <span class="text-neutral-500 uppercase font-bold block text-[10px]">Captured Portal Emails</span>
-          <span class="text-2xl font-extrabold text-blue-700 block" id="adminCapturedEmailsEl">5 Registered</span>
-          <span class="text-[10px] text-neutral-500 block">Real-time login & VIP tracking</span>
+        <div onclick="openInventoryModal()" class="bg-white p-5 rounded-2xl border border-[#e8e0d8] hover:border-[#722f37] cursor-pointer shadow-sm space-y-1 transition-colors">
+          <span class="text-neutral-500 uppercase font-bold block text-[10px]">Total Stock Available</span>
+          <span class="text-2xl font-extrabold text-[#722f37] block" id="adminTotalStockEl">186 Bottles</span>
+          <span class="text-[10px] text-neutral-500 block" id="adminStockValuation">Cellar Valuation: E98,420.00</span>
         </div>
       </div>
 
-      <!-- SECTION 1: WINE CELLAR INVENTORY & STOCK MANAGEMENT -->
-      <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#e8e0d8] pb-3">
+      <!-- Low Stock Alert Banner (Hidden if no low stock) -->
+      <div id="adminLowStockBanner" class="hidden bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 flex items-center justify-between shadow-xs">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-triangle-exclamation text-amber-700 text-lg shrink-0"></i>
           <div>
-            <h3 class="font-serif font-bold text-base text-[#2c1a1a] flex items-center gap-2">
-              <i class="fa-solid fa-wine-bottle text-[#722f37]"></i>
-              <span>Cellar Inventory Management</span>
-            </h3>
-            <p class="text-[11px] text-neutral-500">Edit, increment/decrement stock levels, or insert new wine stock</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="toggleInsertStockForm()" class="btn-wine text-xs px-3.5 py-1.5 flex items-center gap-1.5 shadow">
-              <i class="fa-solid fa-plus"></i>
-              <span>Insert New Stock</span>
-            </button>
+            <strong class="text-amber-900 block font-bold text-xs">
+              Cellar Stock Alert: Some wines have 10 or fewer bottles remaining!
+            </strong>
+            <span class="text-amber-700 text-[11px]" id="adminLowStockNames"></span>
           </div>
         </div>
-
-        <!-- Insert New Stock Form Modal (Hidden by default) -->
-        <div id="insertStockForm" class="hidden p-4 rounded-2xl bg-[#faf6f0] border-2 border-[#c9a03d] space-y-3">
-          <div class="flex justify-between items-center border-b pb-2">
-            <h4 class="font-serif font-bold text-xs text-[#722f37]">Add New Wine to Cellar Inventory</h4>
-            <button onclick="toggleInsertStockForm()" class="text-neutral-400 hover:text-neutral-700 text-sm">✕</button>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <div>
-              <label class="block font-bold mb-1">Wine Name</label>
-              <input type="text" id="newWineName" placeholder="e.g. Rupert & Rothschild Baroness" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg">
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Grape Variety</label>
-              <input type="text" id="newWineVariety" placeholder="e.g. Chardonnay" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg">
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Origin</label>
-              <input type="text" id="newWineOrigin" placeholder="e.g. Franschhoek, South Africa" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg">
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-            <div>
-              <label class="block font-bold mb-1">Price (E / SZL)</label>
-              <input type="number" id="newWinePrice" placeholder="380" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg font-bold text-[#1a6b3c]">
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Initial Stock (Bottles)</label>
-              <input type="number" id="newWineStock" placeholder="24" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg font-bold">
-            </div>
-            <div>
-              <label class="block font-bold mb-1">Vintage</label>
-              <input type="number" id="newWineVintage" placeholder="2021" class="w-full p-2 bg-white border border-[#d8d0c8] rounded-lg">
-            </div>
-          </div>
-          <div class="flex justify-end gap-2 pt-1">
-            <button onclick="toggleInsertStockForm()" class="px-3 py-1.5 rounded-lg bg-neutral-200 text-neutral-700 text-xs font-semibold">Cancel</button>
-            <button onclick="submitNewWineStock()" class="btn-wine text-xs px-4 py-1.5 font-bold shadow">Save to Inventory</button>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left">
-            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
-              <tr>
-                <th class="p-3">Wine</th>
-                <th class="p-3">Variety</th>
-                <th class="p-3">Origin</th>
-                <th class="p-3">Price</th>
-                <th class="p-3">Available Stock</th>
-                <th class="p-3">Quick Stock Update</th>
-              </tr>
-            </thead>
-            <tbody id="adminWineTable" class="divide-y divide-[#f0ece8]"></tbody>
-          </table>
-        </div>
+        <button onclick="openInventoryModal(true)" class="bg-amber-700 hover:bg-amber-800 text-white font-bold px-3.5 py-1.5 rounded-xl transition-colors text-xs shrink-0 shadow-xs">
+          Manage Low Stock
+        </button>
       </div>
 
-      <!-- SECTION 2: SUBSCRIPTION MANAGEMENT (ACTIVATE / CANCEL) -->
-      <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#e8e0d8] pb-3">
-          <div>
-            <h3 class="font-serif font-bold text-base text-[#2c1a1a] flex items-center gap-2">
-              <i class="fa-solid fa-crown text-[#c9a03d]"></i>
-              <span>VIP Wine Club Subscriptions Management</span>
-            </h3>
-            <p class="text-[11px] text-neutral-500">Activate or cancel monthly subscriptions and track recurring revenues</p>
-          </div>
-          <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
-            <i class="fa-solid fa-circle-check"></i>
-            <span id="adminActiveBadge">4 Active Subscriptions</span>
-          </span>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left">
-            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
-              <tr>
-                <th class="p-3">Subscriber Name</th>
-                <th class="p-3">Registered Email</th>
-                <th class="p-3">Plan Tier</th>
-                <th class="p-3">Monthly Rate</th>
-                <th class="p-3">Status</th>
-                <th class="p-3 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody id="adminSubsTable" class="divide-y divide-[#f0ece8]"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- SECTION 3: REAL-TIME PORTAL LOGINS & VIP REGISTERED EMAILS -->
-      <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#e8e0d8] pb-3">
-          <div>
-            <h3 class="font-serif font-bold text-base text-[#2c1a1a] flex items-center gap-2">
-              <i class="fa-solid fa-envelope text-emerald-600"></i>
-              <span>Real-Time Portal Access & VIP Registered Emails</span>
-            </h3>
-            <p class="text-[11px] text-neutral-500">Live stream of captured user emails from site logins and VIP Member Lounge registrations</p>
-          </div>
-          <button onclick="renderAdminAll(); showToast('Real-time database records refreshed!')" class="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors">
-            <i class="fa-solid fa-rotate text-[#c9a03d]"></i>
-            <span>Refresh Real-Time Logs</span>
-          </button>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left">
-            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
-              <tr>
-                <th class="p-3">Registered Email</th>
-                <th class="p-3">Role / Channel</th>
-                <th class="p-3">Access Timestamp</th>
-                <th class="p-3">Location / Device</th>
-                <th class="p-3">Status</th>
-              </tr>
-            </thead>
-            <tbody id="adminEmailsTable" class="divide-y divide-[#f0ece8]"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- SECTION 4: CUSTOMER ORDERS & DELIVERY FULFILMENT (PENDING & DONE TABS) -->
-      <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-5">
+      <!-- MAIN SECTION: CUSTOMER ORDERS & DELIVERY FULFILMENT (VIP BOXES & STANDARD) -->
+      <div id="adminOrdersSection" class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-5">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#e8e0d8] pb-4">
           <div>
             <h3 class="font-serif font-bold text-base text-[#2c1a1a] flex items-center gap-2">
               <i class="fa-solid fa-boxes-packing text-[#722f37]"></i>
-              <span>Customer Orders & Delivery Manifest</span>
+              <span>Customer Orders & VIP Box Delivery Manifest</span>
             </h3>
-            <p class="text-[11px] text-neutral-500">Track pending deliveries, cross-check driver verification tokens, and mark completed orders</p>
+            <p class="text-[11px] text-neutral-500">Track pending wine boxes and regular orders for courier driver fulfillment</p>
           </div>
 
           <!-- Pending / Done Filter Sub-Tabs -->
           <div class="flex items-center gap-2 bg-[#faf6f0] p-1.5 rounded-2xl border border-[#e8e0d8]">
             <button onclick="setAdminOrderFilter('pending')" id="adminTabPendingOrders" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-amber-500 text-white shadow-sm">
               <i class="fa-solid fa-clock"></i>
-              <span>Pending Orders</span>
+              <span>Pending Deliveries</span>
               <span id="adminPendingCountBadge" class="bg-white/30 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">2</span>
             </button>
             <button onclick="setAdminOrderFilter('done')" id="adminTabDoneOrders" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 text-neutral-600 hover:text-[#722f37]">
@@ -1149,8 +1085,8 @@
           <table class="w-full text-xs text-left">
             <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
               <tr>
-                <th class="p-3">Order Ref</th>
-                <th class="p-3">Customer & Address</th>
+                <th class="p-3">Order Ref / Selection</th>
+                <th class="p-3">Customer & Delivery Address</th>
                 <th class="p-3">Driver Contact</th>
                 <th class="p-3">Date</th>
                 <th class="p-3">Total Due</th>
@@ -1162,6 +1098,227 @@
             </thead>
             <tbody id="adminOrdersTable" class="divide-y divide-[#f0ece8]"></tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- COMPACT SPLIT: VIP SUBSCRIBERS SNAPSHOT & REAL-TIME LOGINS -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
+        
+        <!-- VIP Club Snapshot -->
+        <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-serif font-bold text-sm text-[#2c1a1a] flex items-center gap-2">
+              <i class="fa-solid fa-crown text-[#c9a03d]"></i>
+              <span>VIP Wine Club Members</span>
+            </h3>
+            <button onclick="openSubscribersModal()" class="text-[#c9a03d] font-bold hover:underline text-xs">
+              Manage All Members →
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
+                <tr>
+                  <th class="p-2.5">Member</th>
+                  <th class="p-2.5">Tier</th>
+                  <th class="p-2.5">Monthly Dues</th>
+                  <th class="p-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminSubsTable" class="divide-y divide-[#f0ece8]"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Real-Time Logins Snapshot -->
+        <div class="bg-white p-6 rounded-3xl border border-[#e8e0d8] shadow-sm space-y-4">
+          <div class="flex items-center justify-between border-b pb-3">
+            <h3 class="font-serif font-bold text-sm text-[#2c1a1a] flex items-center gap-2">
+              <i class="fa-solid fa-envelope text-emerald-600"></i>
+              <span>Real-Time Portal Access Logs</span>
+            </h3>
+            <button onclick="renderAdminAll(); showToast('Logs updated!')" class="text-[#722f37] font-bold hover:underline text-xs">
+              Refresh Stream →
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600">
+                <tr>
+                  <th class="p-2.5">Email</th>
+                  <th class="p-2.5">Role</th>
+                  <th class="p-2.5">Time</th>
+                  <th class="p-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminEmailsTable" class="divide-y divide-[#f0ece8]"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== INVENTORY CONTROL MODAL (POPUP WINDOW) ==================== -->
+    <div id="inventoryModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-xs animate-in fade-in">
+      <div class="bg-white rounded-3xl max-w-5xl w-full p-6 sm:p-8 shadow-2xl border-2 border-[#722f37] flex flex-col max-h-[90vh]">
+        
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between border-b border-[#e8e0d8] pb-4 mb-4">
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#2c1a1a] flex items-center gap-2">
+              <i class="fa-solid fa-wine-bottle text-[#722f37]"></i>
+              <span>Cellar Inventory Control</span>
+            </h2>
+            <p class="text-xs text-neutral-500 mt-0.5" id="adminInventoryModalSubtitle">
+              Monitor, increment/decrement stock levels, and insert new wines
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openAddWineModal()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-1.5 rounded-xl font-bold flex items-center gap-1 shadow-xs text-xs">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>Insert Stock</span>
+            </button>
+            <button onclick="closeInventoryModal()" class="p-1.5 text-neutral-400 hover:text-neutral-700 rounded-full hover:bg-neutral-100 text-base leading-none">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
+          <div class="relative w-full sm:w-80">
+            <i class="fa-solid fa-magnifying-glass text-neutral-400 absolute left-3 top-3 text-xs"></i>
+            <input
+              type="text"
+              id="adminWineSearch"
+              placeholder="Search wine brand, variety, origin..."
+              oninput="filterAdminWineTable()"
+              class="w-full pl-8 pr-3 py-2 bg-[#faf6f0] border border-[#e8e0d8] rounded-xl text-xs focus:outline-none focus:border-[#722f37]"
+            >
+          </div>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              id="adminLowStockFilterBtn"
+              onclick="toggleAdminLowStockFilter()"
+              class="bg-[#faf6f0] text-neutral-700 border border-[#e8e0d8] text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-neutral-100 flex items-center gap-1.5 transition-colors"
+            >
+              <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+              <span>Filter Low Stock (≤10)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Wine Inventory Table -->
+        <div class="flex-1 overflow-y-auto border border-[#e8e0d8] rounded-2xl">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600 sticky top-0 z-10">
+              <tr>
+                <th class="p-3">Wine</th>
+                <th class="p-3">Variety</th>
+                <th class="p-3">Vintage</th>
+                <th class="p-3">Price</th>
+                <th class="p-3">Available Stock</th>
+                <th class="p-3">Quick Stock Update</th>
+              </tr>
+            </thead>
+            <tbody id="adminWineTable" class="divide-y divide-[#f0ece8]"></tbody>
+          </table>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="mt-4 flex justify-end">
+          <button onclick="closeInventoryModal()" class="btn-wine text-xs px-5 py-2 font-bold rounded-xl">
+            Done / Close Window
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== VIP SUBSCRIBERS MODAL (POPUP WINDOW) ==================== -->
+    <div id="subscribersModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-xs animate-in fade-in">
+      <div class="bg-white rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl border-2 border-[#c9a03d] flex flex-col max-h-[90vh]">
+        <div class="flex items-center justify-between border-b border-[#e8e0d8] pb-4 mb-4">
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#2c1a1a] flex items-center gap-2">
+              <i class="fa-solid fa-crown text-[#c9a03d]"></i>
+              <span>VIP Wine Club Membership Roster</span>
+            </h2>
+            <p class="text-xs text-neutral-500 mt-0.5" id="adminSubscribersModalSubtitle">
+              Manage member active status and delivery schedules
+            </p>
+          </div>
+          <button onclick="closeSubscribersModal()" class="p-1.5 text-neutral-400 hover:text-neutral-700 rounded-full hover:bg-neutral-100 text-base leading-none">
+            ✕
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto border border-[#e8e0d8] rounded-2xl">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-[#faf6f0] border-b border-[#e8e0d8] text-neutral-600 sticky top-0 z-10">
+              <tr>
+                <th class="p-3">Subscriber Name</th>
+                <th class="p-3">Registered Email</th>
+                <th class="p-3">Plan Tier</th>
+                <th class="p-3">Monthly Rate</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminSubsTableFull" class="divide-y divide-[#f0ece8]"></tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 flex justify-end">
+          <button onclick="closeSubscribersModal()" class="btn-wine text-xs px-5 py-2 font-bold rounded-xl">
+            Close Member Roster
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== INSERT WINE STOCK MODAL (POPUP WINDOW) ==================== -->
+    <div id="addWineModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-xs animate-in fade-in">
+      <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border-2 border-[#c9a03d] space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center border-b border-[#e8e0d8] pb-3">
+          <h3 class="font-serif font-bold text-[#722f37] text-base flex items-center gap-2">
+            <i class="fa-solid fa-wine-bottle text-[#c9a03d]"></i>
+            <span>Add New Wine to Cellar Inventory</span>
+          </h3>
+          <button onclick="closeAddWineModal()" class="text-neutral-400 hover:text-neutral-700 text-base leading-none">✕</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div>
+            <label class="block font-bold mb-1">Wine Name *</label>
+            <input type="text" id="newWineName" placeholder="e.g. Tenuta San Guido Sassicaia" class="w-full p-2.5 bg-[#faf6f0] border border-[#d8d0c8] rounded-xl font-semibold">
+          </div>
+          <div>
+            <label class="block font-bold mb-1">Grape Variety *</label>
+            <input type="text" id="newWineVariety" placeholder="e.g. Cabernet Sauvignon" class="w-full p-2.5 bg-[#faf6f0] border border-[#d8d0c8] rounded-xl">
+          </div>
+          <div>
+            <label class="block font-bold mb-1">Origin / Region *</label>
+            <input type="text" id="newWineOrigin" placeholder="e.g. Tuscany, Italy" class="w-full p-2.5 bg-[#faf6f0] border border-[#d8d0c8] rounded-xl">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div>
+            <label class="block font-bold mb-1">Price (E / SZL) *</label>
+            <input type="number" id="newWinePrice" placeholder="380" class="w-full p-2.5 bg-[#faf6f0] border border-[#d8d0c8] rounded-xl font-bold text-[#1a6b3c]">
+          </div>
+          <div>
+            <label class="block font-bold mb-1">Stock Quantity (Bottles) *</label>
+            <input type="number" id="newWineStock" placeholder="24" class="w-full p-2.5 bg-[#faf6f0] border border-[#d8d0c8] rounded-xl font-bold">
+          </div>
+          <div>
+            <label class="block font-bold mb-1">Vintage Year</label>
+            <input type="number" id="newWineVintage" placeholder="2021" class="w-full p-2.5 bg-[#faf6f0] border border-[#d8d0c8] rounded-xl">
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2 border-t border-[#e8e0d8]">
+          <button onclick="closeAddWineModal()" class="px-4 py-2 rounded-xl bg-neutral-200 text-neutral-700 text-xs font-semibold">Cancel</button>
+          <button onclick="submitNewWineStock()" class="btn-wine text-xs px-5 py-2 font-bold shadow">Save into Cellar</button>
         </div>
       </div>
     </div>
@@ -2509,6 +2666,9 @@
       return 'WN-' + last.slice(-4);
     }
 
+    let adminWineLowStockOnly = false;
+    let adminWineSearchQuery = '';
+
     function calculateAdminStats() {
       const totalBottles = WINES.reduce((sum, w) => sum + (Number(w.stock) || 0), 0);
       const totalValuation = WINES.reduce((sum, w) => sum + ((Number(w.stock) || 0) * w.price), 0);
@@ -2518,6 +2678,8 @@
       // Actual gross sales from recorded customer orders + monthly club dues
       const actualOrdersSales = ADMIN_ORDERS.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
       const combinedGrossRevenue = actualOrdersSales + mrr;
+      const pendingOrders = ADMIN_ORDERS.filter(o => o.status === 'pending');
+      const vipPending = pendingOrders.filter(o => (o.itemsSummary || '').includes('VIP') || (o.itemsSummary || '').includes('Box'));
 
       const grossEl = document.getElementById('adminGrossRevEl');
       const stockEl = document.getElementById('adminTotalStockEl');
@@ -2527,6 +2689,13 @@
       const activeBadgeEl = document.getElementById('adminActiveBadge');
       const capturedEmailsEl = document.getElementById('adminCapturedEmailsEl');
 
+      // Top Quick Action button badges & KPI cards
+      const btnStockBadge = document.getElementById('adminBtnStockCount');
+      const btnPendingBadge = document.getElementById('adminBtnPendingBadge');
+      const btnVipBadge = document.getElementById('adminBtnVipBadge');
+      const pendingKpiEl = document.getElementById('adminPendingCountKpi');
+      const vipBoxAlertEl = document.getElementById('adminVipBoxAlert');
+
       if (grossEl) grossEl.innerText = `E${combinedGrossRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       if (stockEl) stockEl.innerText = `${totalBottles} Bottles`;
       if (valuationEl) valuationEl.innerText = `Cellar Valuation: E${totalValuation.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -2534,13 +2703,66 @@
       if (subsMrrEl) subsMrrEl.innerText = `E${mrr.toLocaleString('en-US', { minimumFractionDigits: 2 })} / month MRR`;
       if (activeBadgeEl) activeBadgeEl.innerText = `${activeSubs.length} Active Subscriptions`;
       if (capturedEmailsEl) capturedEmailsEl.innerText = `${ADMIN_EMAIL_LOGS.length} Logged`;
+
+      if (btnStockBadge) btnStockBadge.innerText = `${totalBottles} Btls`;
+      if (btnPendingBadge) btnPendingBadge.innerText = `${pendingOrders.length}`;
+      if (btnVipBadge) btnVipBadge.innerText = `${activeSubs.length}`;
+      if (pendingKpiEl) pendingKpiEl.innerText = `${pendingOrders.length} Order${pendingOrders.length === 1 ? '' : 's'}`;
+      if (vipBoxAlertEl) {
+        if (vipPending.length > 0) {
+          vipBoxAlertEl.classList.remove('hidden');
+          vipBoxAlertEl.innerText = `👑 ${vipPending.length} VIP Box Alert`;
+        } else {
+          vipBoxAlertEl.classList.add('hidden');
+        }
+      }
+
+      // Check low stock wines
+      const lowStockWines = WINES.filter(w => (Number(w.stock) || 0) <= 10);
+      const lowStockBanner = document.getElementById('adminLowStockBanner');
+      const lowStockNames = document.getElementById('adminLowStockNames');
+      if (lowStockBanner) {
+        if (lowStockWines.length > 0) {
+          lowStockBanner.classList.remove('hidden');
+          if (lowStockNames) {
+            lowStockNames.innerText = lowStockWines.map(w => `${w.name} (${w.stock} left)`).join(' • ');
+          }
+        } else {
+          lowStockBanner.classList.add('hidden');
+        }
+      }
     }
 
     function renderAdminTable() {
       const table = document.getElementById('adminWineTable');
       if (!table) return;
 
-      table.innerHTML = WINES.map(w => `
+      let filteredWines = WINES;
+      if (adminWineSearchQuery) {
+        const q = adminWineSearchQuery.toLowerCase();
+        filteredWines = filteredWines.filter(w => 
+          (w.name || '').toLowerCase().includes(q) || 
+          (w.variety || '').toLowerCase().includes(q) || 
+          (w.origin || '').toLowerCase().includes(q)
+        );
+      }
+      if (adminWineLowStockOnly) {
+        filteredWines = filteredWines.filter(w => (Number(w.stock) || 0) <= 10);
+      }
+
+      if (filteredWines.length === 0) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-8 text-center text-neutral-400">
+              <i class="fa-solid fa-wine-bottle text-2xl opacity-40 mb-2 block"></i>
+              <span>No wines found matching your search/filter.</span>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      table.innerHTML = filteredWines.map(w => `
         <tr class="hover:bg-[#faf6f0] transition-colors">
           <td class="p-3 flex items-center gap-2.5">
             <img src="${w.image}" alt="${w.name}" class="w-7 h-10 object-contain rounded" onerror="this.onerror=null;this.src='${w.fallback}'">
@@ -2565,15 +2787,59 @@
               <button onclick="adjustWineStock(${w.id}, -1)" class="w-6 h-6 rounded-lg bg-white border border-[#d8d0c8] hover:bg-red-50 hover:text-red-600 font-bold flex items-center justify-center text-xs transition-colors" title="Remove 1 bottle">-</button>
               <span class="w-7 text-center font-bold text-[#2c1a1a]">${w.stock || 0}</span>
               <button onclick="adjustWineStock(${w.id}, 1)" class="w-6 h-6 rounded-lg bg-white border border-[#d8d0c8] hover:bg-emerald-50 hover:text-emerald-600 font-bold flex items-center justify-center text-xs transition-colors" title="Add 1 bottle">+</button>
-              <button onclick="adjustWineStock(${w.id}, 6)" class="px-2 py-0.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-[10px] font-semibold text-neutral-600 ml-1" title="Add 1 case">+6 (Case)</button>
+              <button onclick="adjustWineStock(${w.id}, 6)" class="px-2 py-0.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-[10px] font-semibold text-neutral-600 ml-1" title="Add 1 case">+6</button>
             </div>
           </td>
         </tr>
       `).join('');
     }
 
+    function filterAdminWineTable() {
+      const searchEl = document.getElementById('adminWineSearch');
+      adminWineSearchQuery = searchEl ? searchEl.value.trim() : '';
+      renderAdminTable();
+    }
+
+    function toggleAdminLowStockFilter() {
+      adminWineLowStockOnly = !adminWineLowStockOnly;
+      const btn = document.getElementById('adminLowStockFilterBtn');
+      if (btn) {
+        if (adminWineLowStockOnly) {
+          btn.className = 'bg-amber-600 text-white border border-amber-600 text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-xs';
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Showing Low Stock (≤10)</span>';
+        } else {
+          btn.className = 'bg-[#faf6f0] text-neutral-700 border border-[#e8e0d8] text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-neutral-100 flex items-center gap-1.5 transition-colors';
+          btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-600"></i> <span>Filter Low Stock (≤10)</span>';
+        }
+      }
+      renderAdminTable();
+    }
+
     function renderAdminSubscriptions() {
       const table = document.getElementById('adminSubsTable');
+      if (!table) return;
+
+      table.innerHTML = ADMIN_SUBSCRIBERS.slice(0, 5).map(sub => `
+        <tr class="hover:bg-[#faf6f0] transition-colors">
+          <td class="p-2.5">
+            <strong class="text-[#2c1a1a] block font-bold">${sub.name}</strong>
+            <span class="text-[10px] text-neutral-400 font-mono">${sub.email}</span>
+          </td>
+          <td class="p-2.5 font-semibold text-[#722f37]">${sub.tier}</td>
+          <td class="p-2.5 font-bold text-[#1a6b3c]">E${Number(sub.price).toFixed(2)}/mo</td>
+          <td class="p-2.5">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+              sub.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+            }">
+              ${sub.status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAdminSubscriptionsFull() {
+      const table = document.getElementById('adminSubsTableFull');
       if (!table) return;
 
       table.innerHTML = ADMIN_SUBSCRIBERS.map(sub => `
@@ -2612,22 +2878,21 @@
       const table = document.getElementById('adminEmailsTable');
       if (!table) return;
 
-      table.innerHTML = ADMIN_EMAIL_LOGS.map(log => `
+      table.innerHTML = ADMIN_EMAIL_LOGS.slice(0, 5).map(log => `
         <tr class="hover:bg-[#faf6f0] transition-colors">
-          <td class="p-3 font-mono font-bold text-[#722f37] text-xs flex items-center gap-1.5">
-            <i class="fa-solid fa-envelope text-neutral-400"></i>
-            <span>${log.email}</span>
+          <td class="p-2.5 font-mono font-bold text-[#722f37] text-xs flex items-center gap-1.5">
+            <i class="fa-solid fa-envelope text-neutral-400 text-[10px]"></i>
+            <span class="truncate max-w-[140px]">${log.email}</span>
           </td>
-          <td class="p-3">
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#722f37]/10 text-[#722f37] uppercase">
+          <td class="p-2.5">
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#722f37]/10 text-[#722f37] uppercase">
               ${log.role}
             </span>
           </td>
-          <td class="p-3 text-neutral-500 text-[11px]"><i class="fa-regular fa-clock text-[#c9a03d] mr-1"></i>${log.time}</td>
-          <td class="p-3 text-neutral-600 text-xs">${log.location}</td>
-          <td class="p-3">
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 uppercase flex items-center gap-1 w-max">
-              <i class="fa-solid fa-circle-check text-[9px]"></i> Authorized
+          <td class="p-2.5 text-neutral-500 text-[11px] whitespace-nowrap"><i class="fa-regular fa-clock text-[#c9a03d] mr-1"></i>${log.time}</td>
+          <td class="p-2.5">
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 uppercase flex items-center gap-1 w-max">
+              <i class="fa-solid fa-circle-check text-[8px]"></i> Authorized
             </span>
           </td>
         </tr>
@@ -2743,8 +3008,60 @@
       calculateAdminStats();
       renderAdminTable();
       renderAdminSubscriptions();
+      renderAdminSubscriptionsFull();
       renderAdminEmails();
       renderAdminOrders();
+    }
+
+    /* ==================== ADMIN MODAL COMMAND WINDOWS ==================== */
+    function openInventoryModal(lowStockFilter = false) {
+      if (lowStockFilter) {
+        adminWineLowStockOnly = true;
+        const btn = document.getElementById('adminLowStockFilterBtn');
+        if (btn) {
+          btn.className = 'bg-amber-600 text-white border border-amber-600 text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shadow-xs';
+          btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Showing Low Stock (≤10)</span>';
+        }
+      }
+      renderAdminTable();
+      const modal = document.getElementById('inventoryModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeInventoryModal() {
+      const modal = document.getElementById('inventoryModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function openSubscribersModal() {
+      renderAdminSubscriptionsFull();
+      const modal = document.getElementById('subscribersModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeSubscribersModal() {
+      const modal = document.getElementById('subscribersModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function openAddWineModal() {
+      const modal = document.getElementById('addWineModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeAddWineModal() {
+      const modal = document.getElementById('addWineModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function focusPendingDeliveries() {
+      setAdminOrderFilter('pending');
+      const section = document.getElementById('adminOrdersSection');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        section.classList.add('ring-4', 'ring-amber-400');
+        setTimeout(() => section.classList.remove('ring-4', 'ring-amber-400'), 2000);
+      }
     }
 
     function adjustWineStock(wineId, delta) {
@@ -2757,8 +3074,7 @@
     }
 
     function toggleInsertStockForm() {
-      const form = document.getElementById('insertStockForm');
-      if (form) form.classList.toggle('hidden');
+      openAddWineModal();
     }
 
     function submitNewWineStock() {
@@ -2788,7 +3104,13 @@
       };
 
       WINES.unshift(newWineItem);
-      toggleInsertStockForm();
+      closeAddWineModal();
+      
+      // Clear inputs
+      if (document.getElementById('newWineName')) document.getElementById('newWineName').value = '';
+      if (document.getElementById('newWinePrice')) document.getElementById('newWinePrice').value = '';
+      if (document.getElementById('newWineStock')) document.getElementById('newWineStock').value = '';
+
       renderAdminAll();
       renderShop();
       showToast(`🍷 Added "${name}" (${stock} bottles) into Cellar Inventory!`);
@@ -3198,6 +3520,26 @@
         ADMIN_SUBSCRIBERS = [newSubItem, ...ADMIN_SUBSCRIBERS];
         localStorage.setItem('wineco_admin_subscribers', JSON.stringify(ADMIN_SUBSCRIBERS));
         recordEmailCapture(email, 'VIP Member Registered', `${address}, Eswatini`);
+
+        // Automatically create a PENDING VIP BOX DELIVERY ORDER in the Admin Order Manifest
+        const todayStr = new Date().toISOString().split('T')[0];
+        const newOrderId = 'ord_vip_' + Date.now();
+        const newOrderRef = 'ORD-' + todayStr.replace(/-/g, '') + '-' + Math.floor(1000 + Math.random() * 9000);
+        const vipPendingOrder = {
+          id: newOrderId,
+          orderRef: newOrderRef,
+          customerName: name,
+          phone: phone,
+          address: address,
+          total: Number(newSubItem.price),
+          paymentMethod: payMethod,
+          date: todayStr,
+          status: 'pending',
+          token: generateDeliveryToken(newOrderRef),
+          itemsSummary: `👑 VIP Box: ${newSubItem.tier} (${selectedSubTier ? selectedSubTier.bottles : 2} Bottles)`
+        };
+        ADMIN_ORDERS = [vipPendingOrder, ...ADMIN_ORDERS];
+        localStorage.setItem('wineco_admin_orders', JSON.stringify(ADMIN_ORDERS));
 
         // Post to API asynchronously if server is running
         try {
